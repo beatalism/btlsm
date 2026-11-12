@@ -1,490 +1,677 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>btlsm</title>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>btlsm — selección musical para bares y cafés</title>
+<meta name="description" content="btlsm: selector de vinilos, DJ y curador de playlists en Córdoba, Argentina. Música elegida a mano para bares y cafés." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050505; --fg:#e8e4dc; --mid:#8a867e; --low:#4a4844; --line:#1e1d1b;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
+  --serif:'Instrument Serif','Times New Roman',serif;
+  --pad:clamp(1.1rem,3.2vw,2.75rem);
+  --dock:3.25rem;
+}
+html{background:var(--bg);color:var(--fg);font:300 14px/1.6 var(--mono);scroll-behavior:smooth}
+body{overflow-x:clip;padding-bottom:var(--dock)}
+::selection{background:var(--fg);color:var(--bg)}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:1px dashed var(--fg);outline-offset:3px}
+pre{font:inherit}
+.tag{font-size:.78rem;letter-spacing:.14em;color:var(--mid);text-transform:lowercase}
+.serif{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.01em;line-height:1}
 
-    :root {
-      --bg: #0d0d0d;
-      --fg: #e8e4dc;
-      --dim: #2e2e2e;
-      --muted: #666;
-      --ff: 'IBM Plex Mono', monospace;
-    }
+/* barra de progreso de la página */
+.rail{position:fixed;inset:0 0 auto 0;height:1px;background:var(--fg);transform-origin:0 50%;transform:scaleX(0);z-index:60}
 
-    html, body {
-      height: 100%;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: var(--ff);
-      overflow-x: hidden;
-      cursor: crosshair;
-    }
+/* nav */
+nav{position:fixed;inset:0 0 auto 0;z-index:50;display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:1rem var(--pad);mix-blend-mode:difference}
+nav a,nav button{font-size:.78rem;letter-spacing:.14em;text-decoration:none;color:var(--fg);opacity:.6;transition:opacity .2s}
+nav a:hover,nav button:hover{opacity:1}
+nav ul{display:flex;gap:clamp(.8rem,2.4vw,2rem);list-style:none;align-items:center}
+nav .home{opacity:1}
 
-    ::selection { background: var(--fg); color: var(--bg); }
+/* hero */
+#inicio{min-height:100svh;display:grid;grid-template-columns:1fr auto;grid-template-rows:1fr auto;padding:5rem var(--pad) calc(var(--dock) + 2rem);position:relative}
+.hero-disc{grid-column:2;grid-row:1;align-self:center;justify-self:end;font-size:clamp(.42rem,1.05vw,.8rem);line-height:1;letter-spacing:.12em;color:var(--mid);white-space:pre;user-select:none}
+.hero-copy{grid-column:1/-1;grid-row:2}
+.hero-name{font-size:clamp(5rem,21vw,19rem);font-weight:300;letter-spacing:-.07em;line-height:.8;margin-left:-.06em;position:relative;display:inline-block;transform-origin:0 100%}
+.hero-name::before,.hero-name::after{content:'btlsm';position:absolute;inset:0;clip-path:inset(0 0 100% 0)}
+.hero-name::before{animation:g1 7s infinite 1s}
+.hero-name::after{animation:g2 7s infinite 1.3s}
+@keyframes g1{0%,90%,100%{clip-path:inset(0 0 100% 0);transform:none}91%{clip-path:inset(20% 0 60% 0);transform:translateX(-5px)}94%{clip-path:inset(62% 0 14% 0);transform:translateX(5px)}97%{clip-path:inset(44% 0 36% 0);transform:translateX(3px)}}
+@keyframes g2{0%,90%,100%{clip-path:inset(0 0 100% 0);transform:none}92%{clip-path:inset(55% 0 20% 0);transform:translateX(5px)}95%{clip-path:inset(14% 0 66% 0);transform:translateX(-4px)}98%{clip-path:inset(30% 0 50% 0);transform:translateX(-5px)}}
+.hero-line{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem;margin-top:2rem;padding-top:1rem;border-top:1px solid var(--line)}
+.hero-line p{max-width:34ch}
+.hero-line .what{font-size:1.05rem;color:var(--fg)}
+.blink{animation:blink 1.1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
 
-    @keyframes glitch1 {
-      0%, 90%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0,0); }
-      91% { clip-path: inset(20% 0 60% 0); transform: translate(-4px, 0); }
-      93% { clip-path: inset(60% 0 15% 0); transform: translate(4px, 0); }
-      95% { clip-path: inset(10% 0 75% 0); transform: translate(-2px, 0); }
-      97% { clip-path: inset(45% 0 35% 0); transform: translate(3px, 0); }
-    }
-    @keyframes glitch2 {
-      0%, 90%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0,0); }
-      92% { clip-path: inset(55% 0 20% 0); transform: translate(4px, 0); }
-      94% { clip-path: inset(15% 0 65% 0); transform: translate(-3px, 0); }
-      96% { clip-path: inset(75% 0 5% 0); transform: translate(2px, 0); }
-      98% { clip-path: inset(30% 0 50% 0); transform: translate(-4px, 0); }
-    }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes scanline {
-      0% { transform: translateY(-100vh); }
-      100% { transform: translateY(100vh); }
-    }
-    @keyframes flicker {
-      0%, 100% { opacity: 1; }
-      92% { opacity: 1; } 93% { opacity: 0.4; }
-      94% { opacity: 1; } 96% { opacity: 0.7; } 97% { opacity: 1; }
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+/* encabezados de sección */
+.head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:0 var(--pad) 1rem;border-bottom:1px solid var(--line)}
+.head h2{font:inherit;font-size:.78rem;letter-spacing:.14em;color:var(--mid)}
+section{position:relative}
+.block{padding:clamp(5rem,14vh,9rem) 0 0}
 
-    .scanline {
-      position: fixed; top: 0; left: 0; right: 0;
-      height: 1px;
-      background: rgba(232,228,220,0.04);
-      animation: scanline 10s linear infinite;
-      pointer-events: none; z-index: 999;
-    }
+/* ── la batea ── */
+#batea{height:calc(var(--n,25) * 34vh + 100vh)}
+.crate{position:sticky;top:0;height:100svh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:center;gap:var(--pad);padding:4.5rem var(--pad) calc(var(--dock) + 1.5rem);overflow:clip}
+.crate-info{align-self:end;padding-bottom:6vh;min-width:0}
+.crate-count{color:var(--mid);font-size:.78rem;letter-spacing:.14em;white-space:pre}
+.crate-artist{margin-top:1.6rem;color:var(--mid);min-height:1.6em}
+.crate-title{font-size:clamp(2.4rem,5.6vw,5.4rem);margin:.35rem 0 1.2rem;min-height:2em;text-wrap:balance}
+.crate-meta{color:var(--mid);white-space:pre-wrap}
+.crate-link{display:inline-block;margin-top:1.4rem;font-size:.78rem;letter-spacing:.14em;text-decoration:none;border-bottom:1px solid var(--low);padding-bottom:.15rem}
+.crate-link:hover{border-color:var(--fg)}
+.stage{position:relative;height:min(62vh,46vw);perspective:1100px;perspective-origin:50% 12%}
+.sleeve{position:absolute;left:50%;bottom:0;width:min(58vh,42vw);aspect-ratio:1;margin-left:calc(min(58vh,42vw) / -2);
+  transform-origin:50% 100%;will-change:transform,opacity;background:#0c0c0b;border:1px solid var(--line);overflow:hidden;
+  display:grid;place-items:center;text-align:center;color:var(--low);font-size:.78rem;padding:1rem;text-decoration:none}
+.sleeve img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;image-rendering:pixelated;filter:grayscale(1) contrast(1.25) brightness(.55);transition:filter .45s}
+.sleeve.on img{filter:none}
+.sleeve::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.28) 0 1px,transparent 1px 3px);pointer-events:none}
+.crate-all{padding:1.2rem var(--pad) 0}
+.crate-all summary{cursor:pointer;color:var(--mid);font-size:.78rem;letter-spacing:.14em;list-style:none}
+.crate-all summary::before{content:'[+] '}
+.crate-all[open] summary::before{content:'[–] '}
+.crate-all ol{list-style:none;columns:2 22rem;gap:var(--pad);margin-top:1rem}
+.crate-all li{break-inside:avoid;padding:.3rem 0;border-bottom:1px solid var(--line);color:var(--mid)}
+.crate-all a{text-decoration:none}
+.crate-all a:hover{color:var(--fg)}
 
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 1.5rem 2.5rem;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .nav-id { font-size: 0.65rem; letter-spacing: 0.2em; color: var(--muted); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-    .nav-links a {
-      font-size: 0.65rem; letter-spacing: 0.2em;
-      color: var(--muted); text-decoration: none; transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--fg); }
+/* ── disco de la semana ── */
+.week{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:var(--pad);align-items:center;padding:3rem var(--pad) 0}
+.week-art{position:relative;aspect-ratio:1.45;max-width:38rem}
+.week-art .cover{position:absolute;left:0;top:0;height:100%;aspect-ratio:1;background:#0c0c0b;border:1px solid var(--line);z-index:2;overflow:hidden}
+.week-art .cover img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated}
+.week-art .vinyl{position:absolute;left:31%;top:50%;translate:0 -50%;font-size:clamp(.34rem,.78vw,.62rem);line-height:1;letter-spacing:.12em;white-space:pre;color:var(--mid);z-index:1;user-select:none}
+.week-title{font-size:clamp(2.6rem,6.4vw,6rem);margin:.5rem 0 1.2rem;text-wrap:balance}
+.week p{color:var(--mid)}
+.week .nota{color:var(--fg);max-width:44ch;margin-top:1.2rem}
 
-    /* HERO */
-    #inicio {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr auto;
-      padding-top: 80px;
-      position: relative;
-      animation: flicker 8s infinite;
-    }
+/* cinta */
+.tape{overflow:clip;border-block:1px solid var(--line);margin-top:clamp(5rem,14vh,9rem);padding:.9rem 0;white-space:nowrap;color:var(--low)}
+.tape span{display:inline-block;font-family:var(--serif);font-style:italic;font-size:clamp(1.6rem,3.4vw,3rem);line-height:1.1}
 
-    /* columna izquierda: ascii + playlists */
-    .hero-left {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 3rem 2rem 3rem 2.5rem;
-      gap: 2.5rem;
-    }
+/* ── selector de ambiente ── */
+.mood{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:var(--pad);padding:3rem var(--pad) 0;align-items:start}
+.mood h3{font-size:clamp(2.2rem,4.6vw,4.2rem);margin-bottom:2rem;text-wrap:balance}
+.q{margin-bottom:1.6rem}
+.q legend{color:var(--mid);font-size:.78rem;letter-spacing:.14em;margin-bottom:.5rem}
+fieldset{border:0}
+.opts{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem}
+.opts label{cursor:pointer;color:var(--mid);white-space:nowrap;padding:.2rem 0}
+.opts input{position:absolute;opacity:0;pointer-events:none}
+.opts label::before{content:'( ) '}
+.opts label:has(:checked){color:var(--fg)}
+.opts label:has(:checked)::before{content:'(•) '}
+.opts label:has(:focus-visible){outline:1px dashed var(--fg);outline-offset:3px}
+.opts label:hover{color:var(--fg)}
+.mood-out{border:1px solid var(--line);padding:1.4rem;min-height:21rem}
+.mood-name{font-size:clamp(1.8rem,3.4vw,3rem);margin:.4rem 0 1rem;min-height:1.1em;overflow-wrap:anywhere}
+.mood-out iframe{width:100%;height:152px;border:0;display:block;filter:grayscale(1) contrast(1.1);transition:filter .4s;background:#0c0c0b}
+.mood-out:hover iframe{filter:none}
+.mood-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.6rem 1.4rem;margin-top:1rem;font-size:.78rem;letter-spacing:.1em}
+.mood-foot a{text-decoration:none;border-bottom:1px solid var(--low)}
+.mood-note{color:var(--mid);margin-top:1.4rem;max-width:52ch}
 
-    .ascii-block {
-      font-size: 0.52rem;
-      line-height: 1.5;
-      color: var(--dim);
-      white-space: pre;
-      pointer-events: none;
-      animation: fadeIn 3s ease 1s both;
-      user-select: none;
-    }
+/* ── mixes ── */
+.mixes{list-style:none;padding:0 var(--pad)}
+.mix{display:grid;grid-template-columns:2.2rem minmax(0,1fr) auto;gap:1rem;align-items:baseline;width:100%;text-align:left;padding:1.05rem 0;border-bottom:1px solid var(--line);transition:padding .25s,color .25s;color:var(--mid)}
+.mix:hover,.mix.on{color:var(--fg);padding-left:.8rem}
+.mix .ico{color:var(--low)}
+.mix:hover .ico,.mix.on .ico{color:var(--fg)}
+.mix .name{font-family:var(--serif);font-style:italic;font-size:clamp(1.4rem,2.6vw,2.1rem);line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mix .name small{font:300 .78rem var(--mono);letter-spacing:.1em;color:var(--low);margin-left:.9rem;font-style:normal}
+.mix .dur{font-size:.78rem;letter-spacing:.1em}
+.mix-more{padding:1.2rem var(--pad) 0;color:var(--mid);font-size:.78rem;letter-spacing:.14em}
 
-    /* SPOTIFY SECTION */
-    .spotify-section {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      animation: slideUp 0.8s ease 1.8s both;
-    }
+/* ── sobre / contacto ── */
+.about{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(2rem,6vw,6rem);padding:3rem var(--pad) 0;align-items:center}
+.portrait{position:relative;font-size:clamp(.36rem,.86vw,.7rem);line-height:1.18;letter-spacing:.06em;user-select:none}
+.portrait pre{position:relative;z-index:2;color:var(--fg);white-space:pre}
+.portrait img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 18%;opacity:0;filter:contrast(1.1);z-index:1}
+.about h3{font-size:clamp(2.2rem,4.8vw,4.4rem);margin-bottom:1.6rem;text-wrap:balance}
+.about p{color:var(--mid);max-width:48ch;margin-bottom:1rem}
+.about p b{color:var(--fg);font-weight:300}
+.offer{list-style:none;margin:1.8rem 0;border-top:1px solid var(--line);max-width:36rem}
+.offer li{display:grid;grid-template-columns:9.5rem minmax(0,1fr);gap:1rem;padding:.75rem 0;border-bottom:1px solid var(--line);color:var(--mid)}
+.offer li span:first-child{color:var(--fg)}
+.links{display:flex;flex-wrap:wrap;gap:.6rem 1.8rem;margin-top:1.6rem}
+.links a{text-decoration:none;border-bottom:1px solid var(--low);padding-bottom:.15rem}
+.links a:hover{border-color:var(--fg)}
+.links a::before{content:'→ ';color:var(--mid)}
+footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem;margin-top:clamp(5rem,14vh,9rem);padding:1.2rem var(--pad) 2rem;border-top:1px solid var(--line);color:var(--low);font-size:.78rem;letter-spacing:.1em}
 
-    .spotify-label {
-      font-size: 0.58rem;
-      letter-spacing: 0.2em;
-      color: var(--muted);
-      margin-bottom: 0.25rem;
-    }
+/* ── reproductor ── */
+.dock{position:fixed;inset:auto 0 0 0;height:var(--dock);z-index:70;background:var(--bg);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:auto minmax(0,14rem) minmax(0,1fr) auto auto;align-items:center;gap:1rem;padding:0 var(--pad);font-size:.85rem}
+.dock .pp{width:2.4rem;height:2rem;border:1px solid var(--low);letter-spacing:0}
+.dock .pp:hover{border-color:var(--fg)}
+.dock .now{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock .bar{white-space:pre;overflow:hidden;color:var(--mid);cursor:pointer;height:1.6em;user-select:none}
+.dock .time{color:var(--mid);font-size:.78rem;white-space:nowrap}
+.dock .lm{font-size:.78rem;letter-spacing:.14em;color:var(--mid);white-space:nowrap}
+.dock .lm:hover{color:var(--fg)}
+.mc{position:fixed;left:0;right:0;bottom:var(--dock);height:60px;z-index:69;opacity:.01;pointer-events:none}
+.mc iframe{width:100%;height:60px;border:0;display:block}
+.mc.show{opacity:1;pointer-events:auto}
 
-    .playlist-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem;
-    }
+/* ── modo escucha ── */
+.listen{position:fixed;inset:0;z-index:100;background:#000;display:none;grid-template-rows:auto 1fr auto;padding:var(--pad);cursor:none}
+.listen.on{display:grid}
+.listen header,.listen .foot{display:flex;justify-content:space-between;gap:1rem;color:var(--low);font-size:.78rem;letter-spacing:.14em}
+.listen button{color:var(--low);cursor:pointer;letter-spacing:.14em}
+.listen button:hover{color:var(--fg)}
+.listen .mid{display:grid;place-items:center;align-content:center;gap:4vh;text-align:center;min-height:0}
+.listen .big{font-size:clamp(.4rem,1.25vmin,.95rem);line-height:1;letter-spacing:.12em;white-space:pre;color:var(--fg)}
+.listen .l-title{font-size:clamp(2rem,6vw,5rem)}
+.listen .l-bar{white-space:pre;color:var(--mid);overflow:hidden;max-width:100%}
+body.listening{overflow:hidden}
 
-    .playlist-item {
-      position: relative;
-      cursor: pointer;
-    }
+/* ── animaciones ligadas al scroll (CSS puro donde el navegador lo soporta) ── */
+@media (prefers-reduced-motion:no-preference){
+  @supports (animation-timeline:view()){
+    .rail{animation:rail linear both;animation-timeline:scroll(root)}
+    @keyframes rail{to{transform:scaleX(1)}}
 
-    /* el iframe de spotify en modo compacto */
-    .playlist-item iframe {
-      width: 100%;
-      height: 80px;
-      border: none;
-      border-radius: 0;
-      display: block;
-      filter: grayscale(1) brightness(0.7);
-      transition: filter 0.4s;
-    }
+    .hero-name{animation:heroOut linear both;animation-timeline:scroll(root);animation-range:0 90vh}
+    @keyframes heroOut{to{transform:scale(.32);opacity:.0;letter-spacing:.2em}}
+    .hero-disc{animation:discOut linear both;animation-timeline:scroll(root);animation-range:0 90vh}
+    @keyframes discOut{to{transform:translateY(-18vh) rotate(-8deg);opacity:0}}
+    .hero-line{animation:fadeOut linear both;animation-timeline:scroll(root);animation-range:10vh 50vh}
+    @keyframes fadeOut{to{opacity:0;transform:translateY(-2rem)}}
 
-    .playlist-item:hover iframe {
-      filter: grayscale(0.3) brightness(0.9);
-    }
+    .rise{animation:rise linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+    @keyframes rise{from{opacity:0;transform:translateY(3.5rem)}}
+    .head h2{animation:track linear both;animation-timeline:view();animation-range:entry 0% cover 30%}
+    @keyframes track{from{letter-spacing:1.2em;opacity:0}}
+    .head{animation:rule linear both;animation-timeline:view();animation-range:entry 0% cover 25%}
+    @keyframes rule{from{border-color:transparent;clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 
-    /* overlay con número */
-    .playlist-num {
-      position: absolute;
-      top: 6px; left: 8px;
-      font-size: 0.5rem;
-      letter-spacing: 0.15em;
-      color: rgba(232,228,220,0.35);
-      pointer-events: none;
-      z-index: 2;
-    }
+    .week-art .vinyl{animation:slide linear both;animation-timeline:view();animation-range:entry 20% cover 55%}
+    @keyframes slide{from{left:2%;opacity:0}}
+    .week-title{animation:blurIn linear both;animation-timeline:view();animation-range:entry 10% cover 40%}
+    @keyframes blurIn{from{filter:blur(14px);opacity:0;transform:translateX(-2rem)}}
 
-    /* columna derecha: nombre + meta */
-    .hero-right {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-end;
-      padding: 3rem 2.5rem 3.5rem 1rem;
-    }
+    .tape span{animation:tape linear both;animation-timeline:view();animation-range:entry 0% exit 100%}
+    @keyframes tape{from{transform:translateX(12vw)}to{transform:translateX(-55%)}}
 
-    .hero-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-      text-align: right;
-      margin-bottom: 1.5rem;
-    }
-    .hero-meta-line {
-      font-size: 0.62rem;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      animation: fadeIn 1s ease both;
-    }
-    .hero-meta-line:nth-child(1) { animation-delay: 1.0s; }
-    .hero-meta-line:nth-child(2) { animation-delay: 1.3s; }
-    .hero-meta-line:nth-child(3) { animation-delay: 1.6s; }
-    .cursor { animation: blink 1.1s step-end infinite; }
+    .mix{animation:mixIn linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+    @keyframes mixIn{from{opacity:0;transform:translateX(-2.5rem)}}
 
-    .hero-name {
-      font-size: clamp(4.5rem, 12vw, 11rem);
-      font-weight: 300;
-      letter-spacing: -0.03em;
-      line-height: 0.88;
-      position: relative;
-      display: inline-block;
-      text-align: right;
-      animation: fadeIn 0.6s ease 0.2s both;
-    }
-    .hero-name::before {
-      content: 'btlsm';
-      position: absolute; inset: 0;
-      color: var(--fg);
-      animation: glitch1 7s infinite 1s;
-    }
-    .hero-name::after {
-      content: 'btlsm';
-      position: absolute; inset: 0;
-      color: var(--fg);
-      animation: glitch2 7s infinite 1.3s;
-    }
+    .portrait pre{animation:asciiOut linear both;animation-timeline:view();animation-range:cover 42% cover 68%}
+    @keyframes asciiOut{to{opacity:.0}}
+    .portrait img{animation:photoIn linear both;animation-timeline:view();animation-range:cover 42% cover 68%}
+    @keyframes photoIn{to{opacity:.92}}
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .hero-name::before,.hero-name::after,.blink{animation:none}
+}
+.portrait:hover pre{opacity:0!important}
+.portrait:hover img{opacity:.92!important}
+.portrait pre,.portrait img{transition:opacity .4s}
 
-    hr.divider { border: none; border-top: 1px solid var(--dim); }
-
-    /* SOBRE */
-    #sobre {
-      padding: 6rem 2.5rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5rem;
-      align-items: start;
-    }
-    .ascii-portrait {
-      font-size: 0.5rem; line-height: 1.3;
-      color: var(--dim); white-space: pre;
-      transition: color 0.5s; user-select: none;
-    }
-    .ascii-portrait:hover { color: var(--muted); }
-    .sobre-tag { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 2rem; }
-    .sobre-content p {
-      font-size: 0.78rem; line-height: 2.1;
-      color: var(--muted); margin-bottom: 1.5rem; font-style: italic;
-    }
-    .sobre-content p strong { color: var(--fg); font-style: normal; font-weight: 400; }
-
-    /* PROYECTOS */
-    #proyectos { padding: 3rem 2.5rem 6rem; }
-    .proj-header {
-      display: flex; justify-content: space-between; align-items: baseline;
-      margin-bottom: 2.5rem;
-      border-bottom: 1px solid var(--dim);
-      padding-bottom: 1rem;
-    }
-    .proj-header span { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); }
-    .proj-item {
-      display: grid; grid-template-columns: 3rem 1fr auto;
-      gap: 2rem; align-items: baseline;
-      padding: 1.1rem 0;
-      border-bottom: 1px solid var(--dim);
-      transition: border-color 0.3s; cursor: default;
-    }
-    .proj-item:hover { border-color: var(--muted); }
-    .proj-item:hover .proj-name { color: var(--fg); }
-    .proj-num { font-size: 0.58rem; color: var(--dim); letter-spacing: 0.1em; }
-    .proj-name { font-size: 0.85rem; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; transition: color 0.3s; }
-    .proj-year { font-size: 0.58rem; color: var(--dim); letter-spacing: 0.1em; }
-
-    /* CONTACTO */
-    #contacto {
-      padding: 5rem 2.5rem;
-      border-top: 1px solid var(--dim);
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 5rem; align-items: end;
-    }
-    .contact-ascii { font-size: 0.5rem; line-height: 1.6; color: var(--dim); white-space: pre; user-select: none; }
-    .contact-tag { font-size: 0.6rem; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 2.5rem; }
-    .contact-links { display: flex; flex-direction: column; gap: 0.9rem; }
-    .contact-link {
-      font-size: 0.73rem; color: var(--muted); text-decoration: none;
-      letter-spacing: 0.08em; display: flex; align-items: center; gap: 1rem;
-      transition: color 0.3s;
-    }
-    .contact-link::before { content: '→'; color: var(--dim); transition: color 0.3s; }
-    .contact-link:hover { color: var(--fg); }
-    .contact-link:hover::before { color: var(--fg); }
-
-    footer {
-      padding: 1.5rem 2.5rem;
-      border-top: 1px solid var(--dim);
-      display: flex; justify-content: space-between;
-      font-size: 0.52rem; letter-spacing: 0.15em; color: var(--dim);
-    }
-
-    @media (max-width: 900px) {
-      #inicio { grid-template-columns: 1fr; grid-template-rows: auto auto; }
-      .hero-left { padding: 6rem 1.5rem 2rem; }
-      .hero-right { align-items: flex-end; padding: 1rem 1.5rem 3rem; }
-      .ascii-block { display: none; }
-      #sobre, #contacto { grid-template-columns: 1fr; gap: 2.5rem; }
-      .ascii-portrait, .contact-ascii { display: none; }
-      nav { padding: 1rem 1.5rem; }
-      .nav-links { gap: 1.5rem; }
-      .playlist-grid { grid-template-columns: 1fr; }
-    }
-  </style>
+@media (max-width:820px){
+  html{font-size:13px}
+  nav ul li.hide-s{display:none}
+  #inicio{grid-template-columns:1fr}
+  .hero-disc{grid-column:1;justify-self:center}
+  .crate{grid-template-columns:1fr;grid-template-rows:1fr auto;align-items:end;gap:1rem}
+  .stage{order:-1;height:min(46vh,82vw);align-self:end}
+  .sleeve{width:min(40vh,74vw);margin-left:calc(min(40vh,74vw) / -2)}
+  .crate-info{padding-bottom:0}
+  .crate-title{font-size:2.3rem;min-height:2.1em;margin-bottom:.6rem}
+  .crate-artist{margin-top:.6rem}
+  .week,.mood,.about{grid-template-columns:1fr}
+  .portrait{justify-self:center;font-size:.42rem}
+  .dock{grid-template-columns:auto minmax(0,1fr) auto;gap:.7rem}
+  .dock .bar,.dock .time{display:none}
+  .mix .name small{display:none}
+  .offer li{grid-template-columns:1fr;gap:0}
+}
+</style>
 </head>
 <body>
 
-<div class="scanline"></div>
+<div class="rail" aria-hidden="true"></div>
 
 <nav>
-  <span class="nav-id">btlsm — v0.1</span>
-  <ul class="nav-links">
-    <li><a href="#sobre">sobre</a></li>
-    <li><a href="#proyectos">trabajo</a></li>
+  <a class="home" href="#inicio">btlsm</a>
+  <ul>
+    <li><a href="#batea">batea</a></li>
+    <li class="hide-s"><a href="#semana">disco de la semana</a></li>
+    <li><a href="#ambiente">ambiente</a></li>
+    <li><a href="#mixes">mixes</a></li>
     <li><a href="#contacto">contacto</a></li>
   </ul>
 </nav>
 
 <section id="inicio">
+  <pre class="hero-disc" id="heroDisc" aria-hidden="true"></pre>
+  <div class="hero-copy">
+    <h1 class="hero-name">btlsm</h1>
+    <div class="hero-line">
+      <p class="what">Selección musical para bares y cafés.</p>
+      <p class="tag">vinilos · playlists · dj sets<br>córdoba, argentina</p>
+      <p class="tag">↓ pasá los discos<span class="blink">_</span></p>
+    </div>
+  </div>
+</section>
 
-  <!-- IZQUIERDA: ascii + playlists -->
-  <div class="hero-left">
+<!-- ── LA BATEA ── -->
+<section id="batea" aria-label="La batea: colección de vinilos">
+  <div class="crate">
+    <div class="crate-info">
+      <p class="crate-count" id="cCount"></p>
+      <p class="crate-artist" id="cArtist"></p>
+      <h2 class="crate-title serif" id="cTitle"></h2>
+      <p class="crate-meta" id="cMeta"></p>
+      <a class="crate-link" id="cLink" href="https://www.discogs.com/es/user/btlsm/collection" target="_blank" rel="noopener">ver en discogs ↗</a>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+</section>
+<details class="crate-all">
+  <summary>la batea completa, en lista</summary>
+  <ol id="cList"></ol>
+</details>
 
-    <div class="ascii-block">    ___  __  __
-   / _ )/ /_/ /__ __ _
-  / _  / __/ (_-&lt;/  ' \
- /____/\__/_/___/_/_/_/
+<!-- ── DISCO DE LA SEMANA ── -->
+<section id="semana" class="block">
+  <div class="head"><h2>disco de la semana</h2><span class="tag" id="wWeek"></span></div>
+  <div class="week">
+    <div class="week-art">
+      <div class="cover"><img id="wImg" alt="" referrerpolicy="no-referrer" /></div>
+      <pre class="vinyl" id="wDisc" aria-hidden="true"></pre>
+    </div>
+    <div>
+      <p id="wArtist"></p>
+      <h3 class="week-title serif" id="wTitle"></h3>
+      <p id="wMeta"></p>
+      <p class="nota" id="wNota" hidden></p>
+      <div class="links"><a id="wLink" target="_blank" rel="noopener">ficha en discogs</a></div>
+    </div>
+  </div>
+</section>
 
- ░░░░░░░░░░░░░░░░░░░░░░
- ░  sistema iniciado  ░
- ░  identidad : —     ░
- ░  estado : latente  ░
- ░  [████████░░] 80%  ░
- ░░░░░░░░░░░░░░░░░░░░░░
+<div class="tape" aria-hidden="true"><span id="tape"></span></div>
 
- &gt; buscando señal...
- &gt; coord: unknown
- &gt; protocolo: activo
- &gt; _</div>
-
-    <div class="spotify-section">
-      <p class="spotify-label">// escuchando_ahora</p>
-      <div class="playlist-grid">
-
-        <div class="playlist-item">
-          <span class="playlist-num">01</span>
-          <iframe
-            src="https://open.spotify.com/embed/playlist/5DLzslWblUk7EYEEJmcETx?utm_source=generator&theme=0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-          </iframe>
+<!-- ── SELECTOR DE AMBIENTE ── -->
+<section id="ambiente" class="block">
+  <div class="head"><h2>selector de ambiente</h2><span class="tag">para dueños de bares y cafés</span></div>
+  <div class="mood">
+    <form class="rise" id="moodForm">
+      <h3 class="serif">¿Cómo tiene que sonar tu local?</h3>
+      <fieldset class="q">
+        <legend>momento del día</legend>
+        <div class="opts">
+          <label><input type="radio" name="m" value="manana">mañana</label>
+          <label><input type="radio" name="m" value="tarde">tarde</label>
+          <label><input type="radio" name="m" value="atardecer">atardecer</label>
+          <label><input type="radio" name="m" value="noche">noche</label>
         </div>
-
-        <div class="playlist-item">
-          <span class="playlist-num">02</span>
-          <iframe
-            src="https://open.spotify.com/embed/playlist/2ukiSOhaV7L4LtjHs4NW6x?utm_source=generator&theme=0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-          </iframe>
+      </fieldset>
+      <fieldset class="q">
+        <legend>energía</legend>
+        <div class="opts">
+          <label><input type="radio" name="e" value="0">baja</label>
+          <label><input type="radio" name="e" value="1" checked>media</label>
+          <label><input type="radio" name="e" value="2">alta</label>
         </div>
-
-        <div class="playlist-item">
-          <span class="playlist-num">03</span>
-          <iframe
-            src="https://open.spotify.com/embed/playlist/7hQJvE7cbg8IUfGHCCZbxT?utm_source=generator&theme=0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-          </iframe>
-        </div>
-
-        <div class="playlist-item">
-          <span class="playlist-num">04</span>
-          <iframe
-            src="https://open.spotify.com/embed/playlist/1hjXFhGc23xXf5yJ8Piopr?utm_source=generator&theme=0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy">
-          </iframe>
-        </div>
-
+      </fieldset>
+      <p class="mood-note">Esto es una muestra de cómo selecciono. Para que suene en tu local, armo la programación a medida en un servicio de música con licencia comercial.</p>
+    </form>
+    <div class="mood-out rise" aria-live="polite">
+      <p class="tag" id="moodWhy"></p>
+      <p class="mood-name serif" id="moodName"></p>
+      <div id="moodEmbed"></div>
+      <div class="mood-foot">
+        <a id="moodOpen" target="_blank" rel="noopener">abrir en spotify ↗</a>
+        <a href="#contacto">quiero esto en mi local →</a>
       </div>
     </div>
-
-  </div>
-
-  <!-- DERECHA: nombre + meta -->
-  <div class="hero-right">
-    <div class="hero-meta">
-      <span class="hero-meta-line">// diseño · código · forma</span>
-      <span class="hero-meta-line">// argentina — [lat -31.4, lon -64.1]</span>
-      <span class="hero-meta-line">// disponible<span class="cursor">_</span></span>
-    </div>
-    <h1 class="hero-name">btlsm</h1>
-  </div>
-
-</section>
-
-<hr class="divider" />
-
-<section id="sobre">
-  <div class="ascii-portrait">  . . . . . . . . . . . . . .
-  . +--------------------+  . .
-  . |  ░░░░░░░░░░░░░░░░  |  . .
-  . |  ░░░░░▓▓▓▓▓░░░░░  |  . .
-  . |  ░░░▓▓▓▓▓▓▓▓░░░░  |  . .
-  . |  ░░▓░░░░░░░▓▓░░░  |  . .
-  . |  ░░░░░▓▓▓░░░░░░░  |  . .
-  . |  ░░░░░░░░░░░░░░░  |  . .
-  . |  ░░▓▓▓▓▓▓▓▓▓▓░░  |  . .
-  . |  ░░░░░░░░░░░░░░░  |  . .
-  . +--------------------+  . .
-  . | btlsm  |  ??????  |  . .
-  . +--------------------+  . .
-  . . . . . . . . . . . . . .
-  &gt; archivo: clasificado
-  &gt; fecha: desconocida
-  &gt; origen: —</div>
-
-  <div class="sobre-content">
-    <p class="sobre-tag">// sobre_mi.txt</p>
-    <p><strong>btlsm</strong> es un proyecto sin terminar.<br>
-    O quizás terminó hace mucho.</p>
-    <p>Trabajo en el espacio donde el <strong>diseño</strong> y el
-    <strong>código</strong> se vuelven indistinguibles.
-    Las formas me interesan más que los nombres.
-    Los sistemas, más que los objetos.</p>
-    <p>Experimento con identidades visuales, interfaces,
-    arte generativo y cosas que todavía no tienen categoría.
-    <strong>El misterio no es un estilo — es el método.</strong></p>
-    <p>&gt; <em>si entendés todo a la primera,<br>
-    no presté suficiente atención.</em></p>
   </div>
 </section>
 
-<section id="proyectos">
-  <div class="proj-header">
-    <span>// trabajos_seleccionados</span>
-    <span>[ 04 registros ]</span>
-  </div>
-  <div>
-    <div class="proj-item">
-      <span class="proj-num">01</span>
-      <span class="proj-name">sistema de identidad sin nombre</span>
-      <span class="proj-year">2024</span>
-    </div>
-    <div class="proj-item">
-      <span class="proj-num">02</span>
-      <span class="proj-name">experimento tipográfico — serie negra</span>
-      <span class="proj-year">2024</span>
-    </div>
-    <div class="proj-item">
-      <span class="proj-num">03</span>
-      <span class="proj-name">interfaz para un lugar que no existe</span>
-      <span class="proj-year">2023</span>
-    </div>
-    <div class="proj-item">
-      <span class="proj-num">04</span>
-      <span class="proj-name">[ archivo encriptado ]</span>
-      <span class="proj-year">????</span>
-    </div>
-  </div>
+<!-- ── MIXES ── -->
+<section id="mixes" class="block">
+  <div class="head"><h2>mixes</h2><span class="tag">suenan acá abajo, sin salir del sitio</span></div>
+  <ol class="mixes" id="mixList"></ol>
+  <p class="mix-more"><a href="https://www.mixcloud.com/antesdeayer/" target="_blank" rel="noopener">todos los mixes en mixcloud ↗</a></p>
 </section>
 
-<section id="contacto">
-  <div class="contact-ascii">  transmitiendo...
-
-  ───────────────────────────
-  DE      : btlsm
-  PARA    : desconocido/a
-  ASUNTO  : —
-  ───────────────────────────
-
-  si llegaste hasta acá
-  probablemente tengas algo
-  interesante para decir.
-
-  &gt; esperando señal...
-  &gt; canal: abierto_
-  ───────────────────────────</div>
-
-  <div>
-    <p class="contact-tag">// transmitir</p>
-    <div class="contact-links">
-      <a href="mailto:tu@email.com" class="contact-link">tu@email.com</a>
-      <a href="https://instagram.com" target="_blank" class="contact-link">instagram</a>
-      <a href="https://linkedin.com" target="_blank" class="contact-link">linkedin</a>
-      <a href="#" class="contact-link">[ canal encriptado ]</a>
+<!-- ── SOBRE / CONTACTO ── -->
+<section id="contacto" class="block">
+  <div class="head"><h2>quién elige</h2><span class="tag">contacto</span></div>
+  <div class="about">
+    <div class="portrait">
+      <pre aria-hidden="true">
+                          ·:+++x=;+;;:
+                       :x#@@%%@@@@@@@%#X:
+                     ;X@@@%##XX#%%#%%###%x
+                    x@@@@#x=+: ::;; ::;=%%·
+                    =@@@%x;;::·         ;##
+                    X%%@X;;;:·           ;@
+                    x%%#x=xx=x===;::;++=xx#
+                    +xX#X#@@@@@@@@@%@@@@@%x
+                    ;==#x;#%@@@@@@#:#@@@@x
+                     +=xX+;+=XX##=:  Xx=;·
+                      :xx==+;:  +==+;    ·
+                        =xX=;;++X%%%X=+·+·
+                        =###xX##X=+++X#xx
+                        +%@@@%#XXXXx==%#
+                        +=#@@@@#x==+;X=
+                   :=;+===xX#%@@%####+
+                ;x#@@=++====xxXX##Xx:=@#x+:
+             +X%@@@@@@#x==========+:+%@@@@@@#x;
+         :=#@@@@@@@@@@@@@%#Xx==xx+;X@@@@@%@@@@@@%X=:
+      ·x%@@@@@@@@@@@@@@@@@@@@@@@@%@@@@@@@%@@@@@@@@@@@=
+     x@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@@@@@@@@@@@@%@@@#
+   ;%@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@@@@@@@@@@@@@@@@@%X
+:;;@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@@@@@@@@@@@@@@@@@@@%@x
+=+X@@@@@@@@@@@@@@@@@@@@@@@@@%%%%@@@@@@@@@@@@@@@@@@@@@@@%@:
+++@@@@@@@@@@@@@@@@@@@@@@@@%#%%%@@@@@@@@@@@@@@@@@@@@@@@@%@#
++=@@@@@@@@@@@@#X%%%%%x:@@%%%#x#x##X%XX%XX%##@@@%@@@@@@@%%@;
++x@@@@@@@@@@@@x;x ;;:;=@@@@#; + =· ::;::;;  %@@@@@@@@@@@@%%
++#@@@@@@@@@@@@@X;:: +%@@@X   ·++:;+::;;;:::·=;;+=%@@@@@@@%@=
++@@@@@@@@@@@@@@+ XXX@@@#;    xx;:==+;·:::;::+   ·%@@@@@@@%%@
+X@@@@@@@@@@@@@@+;@@@@%+:·   =X=··+=+++=+++++=:  X@@@@@@@@%%@#  ·
+@@@@@@@@@@@@@@@%%@@@X;=+   xx==;::=+· xxx=++= ;:X@@@@@@@@%@%@+ :
+@@@@@@@@@@@@@@@@@@#+:=x::=Xx=+;;+:+=  +=;;+=+:=@@@@@@@@@@@@%%@
+@@@@@@@@@@@@@@@@%#::xXX%x=X==;  ;:;x  +X=+++= =@@@@@@@@@@%@@@@#:
+@@@@@@@@@@@@@@@@;=+xXX; ;=:;    ·  :+ :++;x+=· x@@@@@@@@@@@%#x=;
+@@@@@@@@@@@@@@@@X;;;x= ·+X;· ·+    :;:   :=x=  #@@@@@@%Xx+=    :
+@@@%##%#%%%@@@@@#=#:·    ·    : =;;; :·  :·xx: +@@@%X=:   :    :
+xXX=+;;;:···=%@@x+#X;          ++       :+ +=:x%@@@Xx+:···;    ;
++++x=+:;;;::  +%; +XX:         ::        +; x  +@@#=+;·  :+    ;
+======+;;;;;:  :;+;x#=:;:::····:;;·::     ;·;;X%@#=+;::·:;+    ;
++++====+++++;::· :+x%%XX#@@@@@@@@@@@@@@@@@@@@@@@%=;::: ::++    ;
++++++=x=====+;;::· ·+#@@@@@@@@@@@@@@@@@@@@@@@@@@X+;::··::+:    ;</pre>
+      <img src="assets/btlsm.jpg" alt="Retrato de btlsm con anteojos oscuros" loading="lazy" />
+    </div>
+    <div>
+      <h3 class="serif">Alguien eligió cada tema.</h3>
+      <p>Soy <b>btlsm</b> (beatalism). Junto discos, armo playlists y paso música en Córdoba.</p>
+      <p>Para tu local elijo qué suena según la hora, el lugar y la gente que va. <b>Sin algoritmo.</b></p>
+      <ul class="offer">
+        <li><span>playlists</span><span>programación para tu bar o café, por franja horaria</span></li>
+        <li><span>vinilos</span><span>selección en vivo con discos de la batea</span></li>
+        <li><span>dj sets</span><span>para fechas y eventos</span></li>
+      </ul>
+      <div class="links" id="contactLinks"></div>
     </div>
   </div>
 </section>
 
 <footer>
-  <span>btlsm © 2025 — todos los errores son intencionales</span>
-  <span>señal activa desde argentina</span>
+  <span>btlsm © 2026</span>
+  <span>córdoba, argentina · lat -31.4, lon -64.1</span>
 </footer>
 
+<!-- reproductor propio (controla el widget de Mixcloud) -->
+<div class="mc" id="mc"></div>
+<div class="dock" role="region" aria-label="Reproductor">
+  <button class="pp" id="pp" aria-label="Reproducir">▶</button>
+  <span class="now" id="now">elegí un mix</span>
+  <span class="bar" id="bar" role="slider" aria-label="Posición" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0"></span>
+  <span class="time" id="time">--:-- / --:--</span>
+  <button class="lm" id="lmOn">[ modo escucha ]</button>
+</div>
+
+<!-- modo escucha -->
+<div class="listen" id="listen" role="dialog" aria-label="Modo escucha" aria-modal="true">
+  <header><span>btlsm — modo escucha</span><span id="lClock"></span></header>
+  <div class="mid">
+    <pre class="big" id="lDisc" aria-hidden="true"></pre>
+    <p class="l-title serif" id="lTitle"></p>
+    <p class="l-bar" id="lBar"></p>
+  </div>
+  <div class="foot"><button id="lPP">[ pausa ]</button><button id="lOff">[ esc · salir ]</button></div>
+</div>
+
+<script>
+/* ════════ CONTENIDO — editá acá ════════ */
+const CONTACTO = { email:'', instagram:'', whatsapp:'' };   // completá y aparecen solos en "contacto"
+
+// Colección de Discogs (discogs.com/user/btlsm). Agregá `nota:'…'` a un disco para que salga cuando le toque ser disco de la semana.
+const DISCOS = [{"id":"1548070","img":"https://i.discogs.com/HRWeJl1JpOa8fokVXQIGgCF2syl2HZ1_g2pouU4OAVc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1NDgw/NzAtMTQyMDI1MDAz/OS0zMDI0LmpwZWc.jpeg","t":"Diamond Life","a":"Sade","y":"1985","c":"UK","l":"Epic"},{"id":"22040263","img":"https://i.discogs.com/VBkLjTonTDXuYzYkTkgNAertPSTS8b_QTuNAB86rWFk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIyMDQw/MjYzLTE3NTc1NTIz/NTktODU1My5qcGVn.jpeg","t":"Sign \"O\" The Times","a":"Prince","y":"2022","c":"US","l":"NPG Records"},{"id":"9045250","img":"https://i.discogs.com/wsZ9-JchGOQ9WsqLzAwde-iiZWxBIQgKpdCtsFrvGIk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTkwNDUy/NTAtMTQ3MzgwOTYw/MC0zMTY1LmpwZWc.jpeg","t":"Changes","a":"Keith Jarrett, Gary Peacock, Jack DeJohnette","y":"1984","c":"Brazil","l":"ECM Records"},{"id":"1908113","img":"https://i.discogs.com/wCLT267a2HX-XQjND1ZbHN9ksHfMlaEeCaRZtR3mdnY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE5MDgx/MTMtMTM5MjY4MTI1/NS03MzcxLmpwZWc.jpeg","t":"The Mad Hatter","a":"Chick Corea","y":"1978","c":"US","l":"Polydor"},{"id":"12373198","img":"https://i.discogs.com/iJMhLVBob4GkjJj6BbHBEvi_SPrq8SaQCqTefD-kwW4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEyMzcz/MTk4LTE1MzM5NDM2/MDMtNTIwOS5qcGVn.jpeg","t":"Now He Sings, Now He Sobs","a":"Chick Corea","y":"1977","c":"US","l":"Solid State Records"},{"id":"8486783","img":"https://i.discogs.com/Ep7ElRpIh3ROmPLPU-bxApOYB05sPm45pS3E5Mo6vvg/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTg0ODY3/ODMtMTQ2MjU2NjMx/MC04MTMyLmpwZWc.jpeg","t":"Careless","a":"Stephen Bishop","y":"1976","c":"US","l":"ABC Records"},{"id":"4753882","img":"https://i.discogs.com/fEmms2kLaPU29cRvUeDFjuvLmaXwtlAjA7SUajK9Ceo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQ3NTM4/ODItMTM3NDQzMzYz/NC05ODA2LmpwZWc.jpeg","t":"Aja","a":"Steely Dan","y":"1977","c":"US","l":"ABC Records"},{"id":"4987216","img":"https://i.discogs.com/CEys7X1daoAKIVaKKlDeUM_1gP5EOiiAVMrhXNZaIHY/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTQ5ODcy/MTYtMTM4MTQzMzE1/NS0zMTMxLmpwZWc.jpeg","t":"Montreux \"First Divide\"","a":"Various","y":"1981","c":"US","l":"Columbia"},{"id":"3511306","img":"https://i.discogs.com/0FGhW2qUR7H-kjGLl8T2h40nMqR474V0hmqGEyYRX48/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTM1MTEz/MDYtMTMzMzM0MjUy/NC5qcGVn.jpeg","t":"La Rada","a":"Ruben Rada","y":"1981","c":"Argentina","l":"Sazam Records"},{"id":"9119496","img":"https://i.discogs.com/qMdFt-B6jkXxhWkdZ_W45Wk2UD-uHpu3H-5S94SxBeo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTkxMTk0/OTYtMTQ3NzI2MjA4/Ny05NzgyLmpwZWc.jpeg","t":"One World","a":"John Martyn","y":"1977","c":"US","l":"Island Records"},{"id":"2086430","img":"https://i.discogs.com/-OW1E5RGPOa22t3tqUR5-i_BUB6ORxLOB1_P-8nrKy4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIwODY0/MzAtMTI2MzIxNDY5/NS5qcGVn.jpeg","t":"Aleman '72","a":"Oscar Aleman","y":"1972","c":"Argentina","l":"Discos Redondel"},{"id":"530041","img":"https://i.discogs.com/zYFhNV3IUGwq0r_3mlbPGmRNOyPeHD6AsYC92irYGQc/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTUzMDA0/MS0xMzQ4NzQ0NTk3/LTk2MjIuanBlZw.jpeg","t":"An Evening With Herbie Hancock & Chick Corea In Concert 1978","a":"Herbie Hancock & Chick Corea","y":"1978","c":"US","l":"Columbia"},{"id":"11875326","img":"https://i.discogs.com/B44Pfc4QN4H9GVaoz6DMnSm4DSi57w-HCkzMp1WRdbQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTExODc1/MzI2LTE3NDYzMDg3/MjQtNjA1My5qcGVn.jpeg","t":"Récital Bobino 1963","a":"Edith Piaf / Théo Sarapo","y":"1967","c":"Argentina","l":"Odeon"},{"id":"30047941","img":"https://i.discogs.com/G5lkNGuk42avAF8-DBAFSJsaf6gigNDY4HiOxYN5iJI/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTMwMDQ3/OTQxLTE3MTAwMDIx/MDgtODYyMy5qcGVn.jpeg","t":"Automatic For The People","a":"R.E.M.","y":"2023","c":"Argentina","l":"Plaza Independencia Música"},{"id":"22000399","img":"https://i.discogs.com/m3FJeJR5qXIg0ZIAP63D8tfRAx4S1mqFlRzqHBXRmKQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTIyMDAw/Mzk5LTE2NDM4MzYx/NzQtNjUxOS5qcGVn.jpeg","t":"Two Hearts","a":"Men At Work","y":"","c":"US","l":"Columbia"},{"id":"2963173","img":"https://i.discogs.com/u44_g-YoiiRg8aLWhvqjHXauHgMTQ_7jj1pRJNMVaMM/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI5NjMx/NzMtMTQ3ODQ1MTIy/OC02NjE5LmpwZWc.jpeg","t":"Kamikaze","a":"Luis Alberto Spinetta","y":"1982","c":"Argentina","l":"Ratón Finta"},{"id":"2963268","img":"https://i.discogs.com/WjwWU3eldeYrTkc0IRpn8m3P8gfIWsp1yNYSwLkK9H4/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTI5NjMy/NjgtMTMwOTM3NjM4/OC5qcGVn.jpeg","t":"Tester De Violencia","a":"Luis Alberto Spinetta","y":"1988","c":"Argentina","l":"Del Cielito"},{"id":"9042270","img":"https://i.discogs.com/1U1Vjq6VQUqXcsCkU0qwy7nMaAqZel0yfrolW2LbrDo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTkwNDIy/NzAtMTY5MzYwOTk5/Mi03MDcyLmpwZWc.jpeg","t":"Sinfonías","a":"Waldo De Los Rios","y":"1970","c":"Argentina","l":"Music Hall"},{"id":"7982792","img":"https://i.discogs.com/L3W_OjV5OUdhN71ISJsAW6RZ2FzWeNrzVxie21ZsZzo/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTc5ODI3/OTItMTQ1Mjg5MzQ3/Ni0zMjM4LmpwZWc.jpeg","t":"Tan Lejano (So Far)","a":"Crosby, Stills, Nash & Young","y":"1975","c":"Argentina","l":"Atlantic"},{"id":"15609526","img":"https://i.discogs.com/EQl8VtuDOd7Tq4riymK-zV4CqGzw-D-bxrOzTPmTXVk/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE1NjA5/NTI2LTE1OTQ0ODM5/NTgtNjIzNS5qcGVn.jpeg","t":"Verdades y Mentiras","a":"Rodolfo Mederos","y":"1984","c":"Argentina","l":"CBS"},{"id":"14814310","img":"https://i.discogs.com/Ngfm7Eb87nhNQOqQaLnKn2x6ctdJIdyer_TvRZN6_ks/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0ODE0/MzEwLTE2NDA4Nzc3/NjgtMTgzMS5qcGVn.jpeg","t":"Let Me Touch Your Mind","a":"Ike & Tina Turner","y":"1973","c":"Uruguay","l":"United Artists Records"},{"id":"1866420","img":"https://i.discogs.com/bYd_K-TVwZQ7aeAYyqquckFooIPL_vBx2EbF9AqQNmQ/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE4NjY0/MjAtMTQxMTIwNTA2/OC01NDk1LmpwZWc.jpeg","t":"Passions Of A Man: An Anthology Of His Atlantic Recordings","a":"Charles Mingus","y":"1979","c":"US","l":"Atlantic"},{"id":"13295907","img":"https://i.discogs.com/xiiT3bFX2d7Ou1R8u-2XqTSNdL6Xg7eo-mIY5ks_1oA/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEzMjk1/OTA3LTE1NTE1Nzk0/NjctNDMyNC5qcGVn.jpeg","t":"Mariposa Nocturna","a":"Donald Fagen","y":"1982","c":"Argentina","l":"Warner Bros. Records"},{"id":"10765650","img":"https://i.discogs.com/Ka0Z5Sg0dx2_5pWSlqKJgdYM0vb0Lt551rTm5P8732E/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTEwNzY1/NjUwLTE1MDM5MjU5/MTAtODUyNy5qcGVn.jpeg","t":"Music","a":"Carole King","y":"1972","c":"Argentina","l":"A&M Records"},{"id":"14136574","img":"https://i.discogs.com/gNzvLm5KgGI0q0fkUQlekYJXJZBRHsYIsqqJzGp16PU/rs:fit/g:sm/q:40/h:150/w:150/czM6Ly9kaXNjb2dz/LWRhdGFiYXNlLWlt/YWdlcy9SLTE0MTM2/NTc0LTE1Njg2NTYy/MzEtNjU4Mi5qcGVn.jpeg","t":"Rhymes & Reasons = Rimas Y Razones","a":"Carole King","y":"1972","c":"Argentina","l":"A&M Records"}];
+const DISCO_DE_LA_SEMANA = null;   // null = rota solo cada semana · o poné el id de Discogs para fijarlo
+
+// Selector de ambiente: [energía baja, media, alta] por momento → playlist de Spotify
+const PLAYLISTS = {
+  manana:   [['Canciones para cuando llueve temprano','1hjXFhGc23xXf5yJ8Piopr'],['sábado a la mañana','34ncOSAtJgv1qZnKrNPqxe'],['bbta goes 2 work','7hQJvE7cbg8IUfGHCCZbxT']],
+  tarde:    [['Música de otoño (para señoræs sensibles)','48EAxnhfSJW3mTPnRjEUTu'],['easy listening','5KLrMhhsHAbdWgLZ7lBNOa'],['I Found My Smile Again','0iAiGTBH93NvZvnsjecydV']],
+  atardecer:[['joy of missing out','0ilHgUCzEhRmJc4SY59PxS'],['cabernet franc type beats','62KTaoMubVugqvAOQQp5Pf'],['UP↗BEATS','1oGQKBJt8uQBeHW19Uxkbu']],
+  noche:    [['CXILL〽BEATS','1IV8YPbO0KIqYXTUF9mdAW'],['Nwœño 4026','5DLzslWblUk7EYEEJmcETx'],['1n fuego','08IldZZ6FaFfxXG3am35Ws']]
+};
+
+const MIXES = [
+  ['BTLSM ¹²','/antesdeayer/btlsm-12/',2577,'r&b · slowcore'],
+  ['BTLSM ¹¹','/antesdeayer/btlsm-11/',2212,'r&b · slowcore'],
+  ['BTL$M.X','/antesdeayer/btlmx/',3270,'rnb · hip hop'],
+  ['IX. BTLSM @ the WANNABE LOUNGE','/antesdeayer/ixbtlsm-the-w4nn4b3-l0ung3/',2232,''],
+  ['BTLSM.7','/antesdeayer/beatalism-vii/',1928,'rnb · hip hop'],
+  ['BEATALISM / VI / La tormenta','/antesdeayer/beatalism-vila-tormenta/',1688,'slowcore'],
+  ['beatalism ~ iv','/antesdeayer/beatalism-iv/',1073,'slowcore'],
+  ['BeAT/\\liSM . iii ~ { SLOWCORE }','/antesdeayer/b-e-a-t-l-i-s-m-iii-slowcore/',1069,'slowcore · trap · chillwave'],
+  ['BeAT/\\LiSM . ii ~ { FLEX on ME no MORE }','/antesdeayer/b-e-a-t-l-i-s-m-ii-flex-on-me-no-more/',983,'slowcore · trap · chillwave'],
+  ['La mejor defensa es un buen ataque (de bajo)','/antesdeayer/la-mejor-defensa-es-un-buen-ataque-de-bajo/',2674,'glitch funk · disco']
+];
+/* ════════════════════════════════════════ */
+
+const $ = id => document.getElementById(id);
+const pad2 = n => String(n).padStart(2,'0');
+const mmss = s => isFinite(s) ? pad2(Math.floor(s/60))+':'+pad2(Math.floor(s%60)) : '--:--';
+const esc = s => s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const calm = matchMedia('(prefers-reduced-motion:reduce)').matches;
+const discogs = d => 'https://www.discogs.com/es/release/'+d.id;
+
+/* ── disco en ASCII ── */
+const RAMP = ' .·:-=+*#';
+function disc(cols, t){
+  const rows = Math.round(cols*.72); let out = '';
+  for(let y=0;y<rows;y++){
+    for(let x=0;x<cols;x++){
+      const dx=(x-(cols-1)/2)/((cols-1)/2), dy=(y-(rows-1)/2)/((rows-1)/2);
+      const r=Math.hypot(dx,dy), a=Math.atan2(dy,dx);
+      if(r>1){out+=' ';continue}
+      if(r<.06){out+=' ';continue}
+      if(r<.32){out+= Math.cos(a*2-t*2)>.55 ? '·' : (r>.27?':':' ');continue}
+      const band=Math.floor(r*13);
+      const shine=Math.pow(Math.abs(Math.cos(a-.7)),10);          // reflejo fijo de la luz
+      const groove=.5+.5*Math.sin(a*3+band*1.9-t*2);               // surcos que giran
+      const v=.18+.5*shine+.3*groove*(band%2?1:.55);
+      out+=RAMP[Math.min(RAMP.length-1,Math.max(1,Math.round(v*(RAMP.length-1))))];
+    }
+    out+='\n';
+  }
+  return out;
+}
+
+/* ── texto que se "decodifica" ── */
+function scramble(el, text){
+  if(calm){el.textContent=text;return}
+  cancelAnimationFrame(el._raf); let f=0; const N=7, G='░▒▓/\\|_-·:';
+  const step=()=>{
+    f++;
+    el.textContent=[...text].map((c,i)=> c===' '||i<text.length*f/N ? c : G[(Math.random()*G.length)|0]).join('');
+    if(f<N) el._raf=requestAnimationFrame(step);
+  };
+  step();
+}
+
+/* ════════ LA BATEA ════════ */
+const N = DISCOS.length, batea=$('batea'), stage=$('stage');
+batea.style.setProperty('--n',N);
+const sleeves = DISCOS.map((d,i)=>{
+  const el=document.createElement('a');
+  el.className='sleeve'; el.href=discogs(d); el.target='_blank'; el.rel='noopener'; el.style.zIndex=N-i;
+  el.innerHTML='<span>'+esc(d.a)+'<br>'+esc(d.t)+'</span><img alt="Tapa de '+esc(d.t)+', '+esc(d.a)+'" referrerpolicy="no-referrer" src="'+d.img+'" '+(i>3?'loading="lazy" ':'')+'onerror="this.remove()">';
+  el.tabIndex=-1; stage.appendChild(el); return el;
+});
+$('cList').innerHTML = DISCOS.map(d=>'<li><a href="'+discogs(d)+'" target="_blank" rel="noopener">'+esc(d.a)+' — '+esc(d.t)+(d.y?' ('+d.y+')':'')+'</a></li>').join('');
+let cur=-1;
+function showInfo(i){
+  if(i===cur) return; cur=i; const d=DISCOS[i];
+  const fill=Math.round((i+1)/N*16);
+  $('cCount').textContent=pad2(i+1)+' / '+N+'   ['+'█'.repeat(fill)+'░'.repeat(16-fill)+']';
+  scramble($('cArtist'),d.a); scramble($('cTitle'),d.t);
+  $('cMeta').textContent=[d.y,d.c].filter(Boolean).join(' · ')+'\n'+d.l+' · vinilo';
+  $('cLink').href=discogs(d);
+  sleeves.forEach((s,k)=>s.classList.toggle('on',k===i));
+}
+function layout(){
+  const r=batea.getBoundingClientRect(), span=r.height-innerHeight;
+  const p=Math.min(1,Math.max(0,-r.top/span))*(N-1);
+  for(let i=0;i<N;i++){
+    const d=i-p, s=sleeves[i].style;
+    if(d<-1.2||d>9){s.opacity=0;s.pointerEvents='none';continue}
+    s.pointerEvents=Math.abs(d)<.5?'auto':'none';
+    if(d>=0){
+      s.transform='translate3d(0,'+(-d*5.2)+'%,'+(-d*90)+'px)';
+      s.opacity=Math.max(0,1-d*.115);
+    }else{
+      const f=Math.min(1,-d);
+      s.transform='translate3d(0,'+(f*10)+'%,0) rotateX('+(-f*80)+'deg) scale('+(1-f*.12)+')';
+      s.opacity=1-f*f;
+    }
+  }
+  showInfo(Math.round(p));
+}
+let tick=false;
+addEventListener('scroll',()=>{ if(!tick){tick=true;requestAnimationFrame(()=>{tick=false;layout()})} },{passive:true});
+addEventListener('resize',layout); layout();
+
+/* ════════ DISCO DE LA SEMANA ════════ */
+(function(){
+  const now=new Date(), t=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
+  const day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
+  const y=t.getUTCFullYear(), w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7);
+  const d = DISCOS.find(x=>x.id===String(DISCO_DE_LA_SEMANA)) || DISCOS[(y*53+w*7)%N];
+  $('wWeek').textContent='semana '+pad2(w)+' · '+y;
+  $('wArtist').textContent=d.a; $('wTitle').textContent=d.t;
+  $('wMeta').textContent=[d.y,d.c,d.l].filter(Boolean).join(' · ');
+  $('wImg').src=d.img; $('wImg').alt='Tapa de '+d.t; $('wImg').onerror=function(){this.remove()};
+  $('wLink').href=discogs(d);
+  if(d.nota){$('wNota').textContent=d.nota;$('wNota').hidden=false}
+})();
+$('tape').textContent=[...new Set(DISCOS.map(d=>d.a))].filter(a=>a!=='Various').join('  ·  ');
+
+/* ════════ SELECTOR DE AMBIENTE ════════ */
+const form=$('moodForm'), MN={manana:'mañana',tarde:'tarde',atardecer:'atardecer',noche:'noche'}, EN=['energía baja','energía media','energía alta'];
+function mood(auto){
+  const m=form.m.value, e=+form.e.value, [name,id]=PLAYLISTS[m][e];
+  const h=new Date();
+  $('moodWhy').textContent=(auto?'ahora son las '+pad2(h.getHours())+':'+pad2(h.getMinutes())+' → ':'')+MN[m]+' · '+EN[e];
+  scramble($('moodName'),name);
+  $('moodOpen').href='https://open.spotify.com/playlist/'+id;
+  $('moodEmbed').innerHTML='<iframe title="Playlist '+esc(name)+' en Spotify" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" src="https://open.spotify.com/embed/playlist/'+id+'?utm_source=generator&theme=0"></iframe>';
+}
+(function(){ const h=new Date().getHours(); form.m.value = h>=6&&h<12?'manana':h<17?'tarde':h<21?'atardecer':'noche'; mood(true) })();
+form.addEventListener('change',()=>mood(false));
+
+/* ════════ MIXES + REPRODUCTOR ════════ */
+$('mixList').innerHTML = MIXES.map((m,i)=>'<li><button class="mix" data-i="'+i+'"><span class="ico">▶</span><span class="name">'+esc(m[0])+(m[3]?'<small>'+m[3]+'</small>':'')+'</span><span class="dur">'+mmss(m[2])+'</span></button></li>').join('');
+const P={i:-1,widget:null,playing:false,pos:0,dur:0};
+function paint(){
+  const m=MIXES[P.i], bar=$('bar');
+  $('pp').textContent=P.playing?'❙❙':'▶'; $('pp').setAttribute('aria-label',P.playing?'Pausar':'Reproducir');
+  $('now').textContent=m?m[0]:'elegí un mix';
+  const dur=P.dur||(m?m[2]:0), f=dur?P.pos/dur:0;
+  const w=Math.max(8,Math.floor(bar.clientWidth/8.45)), k=Math.min(w-1,Math.round(f*(w-1)));
+  bar.textContent='━'.repeat(k)+'●'+'─'.repeat(w-1-k); bar.setAttribute('aria-valuenow',Math.round(f*100));
+  $('time').textContent=m?mmss(P.pos)+' / '+mmss(dur):'--:-- / --:--';
+  document.querySelectorAll('.mix').forEach((b,k2)=>{b.classList.toggle('on',k2===P.i);b.firstChild.textContent=k2===P.i&&P.playing?'❙❙':'▶'});
+  $('lTitle').textContent=m?m[0]:''; $('lPP').textContent=P.playing?'[ pausa ]':'[ play ]';
+  const lw=44, lk=Math.round(f*(lw-1)); $('lBar').textContent=mmss(P.pos)+'  '+'━'.repeat(lk)+'●'+'─'.repeat(lw-1-lk)+'  '+mmss(dur);
+}
+function bind(w){
+  P.widget=w;
+  w.events.play.on(()=>{P.playing=true;paint()});
+  w.events.pause.on(()=>{P.playing=false;paint()});
+  w.events.progress.on((pos,dur)=>{P.pos=pos;P.dur=dur;paint()});
+  w.events.ended.on(()=>{P.playing=false;play((P.i+1)%MIXES.length)});
+}
+function loadApi(){
+  return window.Mixcloud&&Mixcloud.PlayerWidget ? Promise.resolve() : new Promise((ok,no)=>{
+    const s=document.createElement('script'); s.src='https://widget.mixcloud.com/media/js/widgetApi.js'; s.onload=ok; s.onerror=no; document.head.appendChild(s);
+  });
+}
+function play(i){
+  const m=MIXES[i]; P.i=i; P.pos=0; P.dur=m[2]; paint();
+  if(P.widget){ P.widget.load(m[1],true); return }
+  const f=document.createElement('iframe');
+  f.allow='autoplay; encrypted-media'; f.title='Reproductor de Mixcloud';
+  f.src='https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&autoplay=1&feed='+encodeURIComponent(m[1]);
+  $('mc').replaceChildren(f);
+  loadApi().then(()=>{ const w=Mixcloud.PlayerWidget(f); return w.ready.then(()=>{bind(w); w.play()}) })
+    .catch(()=>{ $('mc').classList.add('show') });   // si la API no carga, queda a la vista el reproductor oficial
+}
+function toggle(){
+  if(P.i<0) return play(0);
+  if(!P.widget) return;
+  P.playing ? P.widget.pause() : P.widget.play();
+}
+$('mixList').addEventListener('click',e=>{ const b=e.target.closest('.mix'); if(!b) return; const i=+b.dataset.i; i===P.i ? toggle() : play(i) });
+$('pp').addEventListener('click',toggle);
+function seekTo(f){ if(P.widget&&P.dur){ P.widget.seek(Math.max(0,Math.min(1,f))*P.dur) } }
+$('bar').addEventListener('click',e=>{ const r=e.currentTarget.getBoundingClientRect(); seekTo((e.clientX-r.left)/r.width) });
+$('bar').addEventListener('keydown',e=>{ if(!P.dur) return; if(e.key==='ArrowRight') seekTo((P.pos+30)/P.dur); if(e.key==='ArrowLeft') seekTo((P.pos-30)/P.dur) });
+addEventListener('resize',paint); paint();
+
+/* ════════ MODO ESCUCHA ════════ */
+const listen=$('listen');
+function setListen(on){
+  const go=()=>{ listen.classList.toggle('on',on); document.body.classList.toggle('listening',on) };
+  document.startViewTransition&&!calm ? document.startViewTransition(go) : go();
+  if(on){ if(P.i<0) play(0); document.documentElement.requestFullscreen?.().catch(()=>{}); $('lOff').focus() }
+  else if(document.fullscreenElement) document.exitFullscreen?.();
+}
+$('lmOn').addEventListener('click',()=>setListen(true));
+$('lOff').addEventListener('click',()=>setListen(false));
+$('lPP').addEventListener('click',toggle);
+addEventListener('keydown',e=>{ if(!listen.classList.contains('on')) return; if(e.key==='Escape') setListen(false); if(e.key===' '){e.preventDefault();toggle()} });
+document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement&&listen.classList.contains('on')) setListen(false) });
+
+/* ════════ CONTACTO ════════ */
+(function(){
+  const L=[];
+  if(CONTACTO.email) L.push(['mailto:'+CONTACTO.email,CONTACTO.email]);
+  if(CONTACTO.whatsapp) L.push(['https://wa.me/'+CONTACTO.whatsapp.replace(/\D/g,''),'whatsapp']);
+  if(CONTACTO.instagram) L.push(['https://instagram.com/'+CONTACTO.instagram.replace('@',''),'instagram']);
+  L.push(['https://www.mixcloud.com/antesdeayer/','mixcloud'],['https://open.spotify.com/user/11134314484','spotify'],['https://www.discogs.com/es/user/btlsm/collection','discogs']);
+  $('contactLinks').innerHTML=L.map(([h,t])=>'<a href="'+h+'"'+(h.startsWith('http')?' target="_blank" rel="noopener"':'')+'>'+esc(t)+'</a>').join('');
+})();
+
+/* ════════ los discos giran: lento siempre, a 33 rpm cuando suena, y con el scroll ════════ */
+let ang=0, lastY=scrollY, lastT=0;
+function spin(ts){
+  requestAnimationFrame(spin);
+  if(ts-lastT<80) return;                       // ~12 cuadros por segundo: lo-fi a propósito
+  const dt=(ts-lastT)/1000; lastT=ts;
+  const v=Math.abs(scrollY-lastY); lastY=scrollY;
+  ang+= dt*(P.playing?3.45:.5) + v*.004;
+  if(listen.classList.contains('on')){
+    $('lDisc').textContent=disc(72,ang);
+    const h=new Date(); $('lClock').textContent=pad2(h.getHours())+':'+pad2(h.getMinutes());
+    return;
+  }
+  if(scrollY<innerHeight) $('heroDisc').textContent=disc(64,ang);
+  const wr=$('wDisc').getBoundingClientRect();
+  if(wr.bottom>0&&wr.top<innerHeight) $('wDisc').textContent=disc(58,ang);
+}
+$('heroDisc').textContent=disc(64,0); $('wDisc').textContent=disc(58,0);
+if(!calm) requestAnimationFrame(spin);
+</script>
 </body>
 </html>
