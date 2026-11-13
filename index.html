@@ -32,11 +32,33 @@ nav a:hover,nav button:hover,nav .home{opacity:1}
 nav ul{display:flex;gap:clamp(.8rem,2.2vw,1.9rem);list-style:none;align-items:center}
 
 /* ── inicio: el retrato ── */
-#inicio{height:260vh}
-.hero{position:sticky;top:0;height:100svh;overflow:clip;display:grid;align-items:center;justify-items:end;padding:0 var(--pad) 3.2rem}
+#inicio{height:100svh}
+.hero{height:100svh;overflow:clip;display:grid;align-items:center;justify-items:end;padding:0 var(--pad) 3.2rem}
 .face{position:relative;font-size:var(--fs,8px)}
 .face pre{position:relative;z-index:2;color:var(--fg)}
 .face img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;z-index:1;clip-path:inset(0 0 100% 0);filter:contrast(1.15)}
+
+/* presentación: el texto se enciende palabra por palabra con el scroll */
+#presentacion{height:230vh}
+.intro{position:sticky;top:0;min-height:100svh;display:flex;flex-wrap:wrap;align-content:center;gap:0 .32em;padding:5rem var(--pad);font-size:clamp(1.5rem,4.1vw,3.6rem);line-height:1.22;letter-spacing:-.02em;max-width:26em}
+.intro span{color:var(--low);transition:color .25s}
+.intro span.on{color:var(--fg)}
+
+/* carrusel */
+.car-tabs{justify-content:flex-start;gap:.4rem 1.8rem}
+.car-tabs button{padding:.2rem 0;border-bottom:1px solid transparent;color:var(--low)}
+.car-tabs button:hover{color:var(--fg)}
+.car-tabs button.on{color:var(--fg);border-color:var(--fg)}
+.car-count{margin-left:auto;white-space:pre}
+.car-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.car-track::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;padding:2.4rem var(--pad) 0;min-width:0}
+.feat{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:var(--pad);align-items:start}
+.feat h3{font:inherit;font-size:clamp(1.5rem,3.2vw,2.6rem);line-height:1.15;margin:.5rem 0 1.4rem;overflow-wrap:anywhere;text-wrap:balance}
+.emb iframe{height:352px}
+.frame-foot button{font-size:.8rem;letter-spacing:.1em;color:var(--mid)}
+.frame-foot button:hover{color:var(--fg)}
+.car-note{padding:1.4rem var(--pad) 0}
 .hero-title{position:absolute;left:var(--pad);bottom:clamp(5.5rem,16vh,9rem);z-index:3;font-size:min(1.7vw,1.35rem);color:var(--fg);mix-blend-mode:difference}
 .hero-line{position:absolute;inset:auto var(--pad) 1.6rem var(--pad);z-index:3;display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem 2rem;padding-top:.9rem;border-top:1px solid var(--low);mix-blend-mode:difference}
 .hero-line .what{font-size:1.05rem}
@@ -53,8 +75,6 @@ nav ul{display:flex;gap:clamp(.8rem,2.2vw,1.9rem);list-style:none;align-items:ce
 .rise.in{opacity:1;transform:none}
 
 /* playlists */
-.mood{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:var(--pad);padding:2.4rem var(--pad) 0;align-items:start}
-.mood h3{font:inherit;font-size:1.25rem;margin-bottom:1.8rem;max-width:22ch}
 fieldset{border:0;margin-bottom:1.5rem}
 legend{color:var(--mid);font-size:.8rem;letter-spacing:.14em;margin-bottom:.5rem}
 .opts{display:flex;flex-wrap:wrap;gap:.3rem 1.4rem}
@@ -71,7 +91,6 @@ legend{color:var(--mid);font-size:.8rem;letter-spacing:.14em;margin-bottom:.5rem
 .frame-name{font-size:1.25rem;min-height:1.65em;overflow-wrap:anywhere}
 .frame iframe{width:100%;border:0;display:block;background:#0a0a0a;filter:grayscale(1) contrast(1.08);transition:filter .5s}
 .frame:hover iframe,.frame:focus-within iframe{filter:none}
-#moodEmbed iframe{height:352px}
 .frame-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1.4rem;margin-top:.9rem;font-size:.8rem;letter-spacing:.1em}
 .frame-foot a,.links a{text-decoration:none;border-bottom:1px solid var(--low);padding-bottom:.1rem}
 .frame-foot a:hover,.links a:hover{border-color:var(--fg)}
@@ -89,11 +108,18 @@ legend{color:var(--mid);font-size:.8rem;letter-spacing:.14em;margin-bottom:.5rem
 #mixEmbed iframe{height:120px}
 
 /* discos */
-.week{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(1.5rem,5vw,4rem);align-items:center;padding:2.4rem var(--pad)}
-.week pre{color:var(--mid);font-size:clamp(.42rem,.8vw,.66rem)}
-.week h3{font:inherit;font-size:clamp(1.5rem,3.4vw,2.6rem);line-height:1.15;margin:.4rem 0 .8rem;text-wrap:balance}
-.week p{color:var(--mid)}
-.week .nota{color:var(--fg);max-width:46ch;margin-top:1rem}
+.trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.pick{position:relative;padding:2rem var(--pad) 2.2rem;border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:17rem;overflow:hidden}
+.pick:last-child{border-right:0}
+.pick h3{font:inherit;font-size:clamp(1.3rem,2.3vw,1.9rem);line-height:1.18;margin:auto 0 .7rem;padding-top:2.5rem;text-wrap:balance;position:relative;z-index:1}
+.pick p{color:var(--mid);position:relative;z-index:1}
+.pick a{margin-top:1rem;font-size:.8rem;letter-spacing:.1em;text-decoration:none;color:var(--mid);position:relative;z-index:1}
+.pick a:hover{color:var(--fg)}
+.pick.now pre{position:absolute;right:-12%;top:8%;color:var(--low);font-size:clamp(.34rem,.62vw,.52rem)}
+.all summary{cursor:pointer;padding:1.1rem var(--pad);list-style:none}
+.all summary::before{content:'[+] '}
+.all[open] summary::before{content:'[–] '}
+.all summary::-webkit-details-marker{display:none}
 .recs{list-style:none;padding:0 var(--pad);border-top:1px solid var(--line)}
 .rec{display:grid;grid-template-columns:2.4rem minmax(0,1.1fr) minmax(0,1.5fr) 4rem minmax(0,.9fr);gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--line);color:var(--mid);text-decoration:none;transition:color .2s,background .2s}
 .rec:hover,.rec:focus-visible{color:var(--bg);background:var(--fg)}
@@ -103,8 +129,10 @@ legend{color:var(--mid);font-size:.8rem;letter-spacing:.14em;margin-bottom:.5rem
 .rec:hover .t,.rec:hover .n,.rec:focus-visible .t,.rec:focus-visible .n{color:var(--bg)}
 
 /* contacto */
-.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--pad);padding:2.4rem var(--pad) 0}
-.about h3{font:inherit;font-size:clamp(1.5rem,3.4vw,2.6rem);line-height:1.15;text-wrap:balance}
+.about{display:grid;grid-template-columns:auto minmax(0,1fr);gap:clamp(2rem,6vw,6rem);padding:2.4rem var(--pad) 0;align-items:center}
+.about h3{font:inherit;font-size:clamp(1.5rem,3.4vw,2.6rem);line-height:1.15;text-wrap:balance;margin-bottom:1.4rem}
+.mail{display:inline-block;font-size:clamp(1.1rem,2.2vw,1.7rem);text-decoration:none;border-bottom:1px solid var(--low);padding-bottom:.15rem;overflow-wrap:anywhere}
+.mail:hover{border-color:var(--fg)}
 .about p{color:var(--mid);max-width:48ch;margin-bottom:1rem}
 .about p b{color:var(--fg);font-weight:300}
 .offer{list-style:none;margin:1.6rem 0;border-top:1px solid var(--line)}
@@ -134,11 +162,15 @@ body.listening{overflow:hidden}
   nav ul li.hide-s{display:none}
   .hero{justify-items:center;align-items:start;padding-top:4rem}
   .hero-title{font-size:2.9vw;bottom:9.6rem}
-  .mood,.mixwrap,.about{grid-template-columns:1fr}
+  .feat,.mixwrap,.about{grid-template-columns:1fr}
+  .about .face{justify-self:center}
+  .trio{grid-template-columns:1fr}
+  .pick{border-right:0;border-bottom:1px solid var(--line);min-height:12rem}
+  .pick:last-child{border-bottom:0}
+  .emb iframe{height:232px}
+  .car-count{display:none}
   .deck{position:static;order:-1;margin:1.4rem 0 .4rem}
   .deck pre{display:none}
-  .week{grid-template-columns:1fr}
-  .week pre{display:none}
   .rec{grid-template-columns:2rem minmax(0,1fr) 3rem;row-gap:0}
   .rec .a{grid-column:2}.rec .t{grid-column:2;grid-row:2}.rec .y{grid-column:3;grid-row:1}.rec .l{display:none}
   .mix .name small{display:none}
@@ -164,7 +196,6 @@ body.listening{overflow:hidden}
   <div class="hero">
     <div class="face" id="face">
       <pre class="art" id="facePre" aria-hidden="true"></pre>
-      <img src="assets/btlsm.jpg" alt="Retrato de btlsm con anteojos oscuros" />
     </div>
     <h1 class="hero-title" aria-label="btlsm"><pre class="art" aria-hidden="true">88                 88
 88           ,d    88
@@ -177,9 +208,14 @@ body.listening{overflow:hidden}
     <div class="hero-line">
       <p class="what">Selección musical para bares y cafés.</p>
       <p class="tag">vinilos · playlists · dj sets — córdoba, argentina</p>
-      <p class="tag" id="heroHint">↓ seguí bajando<span class="blink">_</span></p>
+      <p class="tag">↓ seguí bajando<span class="blink">_</span></p>
     </div>
   </div>
+</section>
+
+<!-- ── PRESENTACIÓN ── -->
+<section id="presentacion" aria-label="Presentación">
+  <p class="intro" id="intro" lang="en">btlsm [a.k.a. beatalism] is a dj, playlist curator and vinyl selector from Córdoba, Argentina. He plays slowcore beats, indie rnb, hip hop and soul, creating ideal atmospheres for cool AND calm spaces looking to infuse audiences into great taste experiences.</p>
 </section>
 
 <!-- ── PLAYLISTS ── -->
@@ -194,38 +230,57 @@ body.listening{overflow:hidden}
 88`YbbdP"'  88 `"8bbdP"Y8     Y88'    88 88 `"YbbdP"'   "Y888 `"YbbdP"'
 88                            d8'
 88                           d8'</pre></h2>
-  <div class="sub"><span class="tag">para dueños de bares y cafés</span><span class="tag">elegí el momento y escuchá</span></div>
-  <div class="mood">
-    <form class="rise" id="moodForm">
-      <h3>¿Cómo tiene que sonar tu local?</h3>
-      <fieldset>
-        <legend>momento del día</legend>
-        <div class="opts">
-          <label><input type="radio" name="m" value="manana">mañana</label>
-          <label><input type="radio" name="m" value="tarde">tarde</label>
-          <label><input type="radio" name="m" value="atardecer">atardecer</label>
-          <label><input type="radio" name="m" value="noche">noche</label>
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend>energía</legend>
-        <div class="opts">
-          <label><input type="radio" name="e" value="0">baja</label>
-          <label><input type="radio" name="e" value="1" checked>media</label>
-          <label><input type="radio" name="e" value="2">alta</label>
-        </div>
-      </fieldset>
-      <p class="note">Esto es una muestra de cómo selecciono. Para que suene en tu local, armo la programación a medida en un servicio de música con licencia comercial.</p>
-    </form>
-    <div class="frame rise" aria-live="polite">
-      <div class="frame-top"><span class="frame-name" id="moodName"></span><span class="tag" id="moodWhy"></span></div>
-      <div id="moodEmbed"></div>
-      <div class="frame-foot">
-        <a id="moodOpen" target="_blank" rel="noopener">abrir en spotify ↗</a>
-        <a href="#contacto">quiero esto en mi local →</a>
-      </div>
-    </div>
+  <div class="sub car-tabs">
+    <button class="tag" data-go="0">última</button>
+    <button class="tag" data-go="1">seleccionada</button>
+    <button class="tag" data-go="2">elegí la tuya</button>
+    <span class="tag car-count" id="carCount" aria-hidden="true"></span>
   </div>
+  <div class="car-track" id="carTrack">
+    <article class="slide" aria-label="Última playlist">
+      <div class="feat">
+        <div><p class="tag">última playlist</p><h3 id="plLastName"></h3><p class="note">Lo más reciente que armé.</p></div>
+        <div class="frame"><div class="emb" id="plLastEmbed"></div><div class="frame-foot"><a id="plLastOpen" target="_blank" rel="noopener">abrir en spotify ↗</a><button data-go="1">siguiente →</button></div></div>
+      </div>
+    </article>
+    <article class="slide" aria-label="Playlist seleccionada">
+      <div class="feat">
+        <div><p class="tag">playlist seleccionada</p><h3 id="plPickName"></h3><p class="note">La que mejor muestra cómo selecciono.</p></div>
+        <div class="frame"><div class="emb" id="plPickEmbed"></div><div class="frame-foot"><a id="plPickOpen" target="_blank" rel="noopener">abrir en spotify ↗</a><button data-go="2">siguiente →</button></div></div>
+      </div>
+    </article>
+    <article class="slide" aria-label="Elegí una playlist por momento y energía">
+      <div class="feat">
+        <form id="moodForm">
+          <p class="tag">elegí la tuya</p>
+          <h3>¿Cómo tiene que sonar tu local?</h3>
+          <fieldset>
+            <legend>momento del día</legend>
+            <div class="opts">
+              <label><input type="radio" name="m" value="manana">mañana</label>
+              <label><input type="radio" name="m" value="tarde">tarde</label>
+              <label><input type="radio" name="m" value="atardecer">atardecer</label>
+              <label><input type="radio" name="m" value="noche">noche</label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>energía</legend>
+            <div class="opts">
+              <label><input type="radio" name="e" value="0">baja</label>
+              <label><input type="radio" name="e" value="1" checked>media</label>
+              <label><input type="radio" name="e" value="2">alta</label>
+            </div>
+          </fieldset>
+        </form>
+        <div class="frame" aria-live="polite">
+          <div class="frame-top"><span class="frame-name" id="moodName"></span><span class="tag" id="moodWhy"></span></div>
+          <div class="emb" id="moodEmbed"></div>
+          <div class="frame-foot"><a id="moodOpen" target="_blank" rel="noopener">abrir en spotify ↗</a><a href="#contacto">quiero esto en mi local →</a></div>
+        </div>
+      </div>
+    </article>
+  </div>
+  <p class="car-note note">Para que suene en tu local, armo la programación a medida en un servicio de música con licencia comercial.</p>
 </section>
 
 <pre class="art wave" data-wave aria-hidden="true"></pre>
@@ -267,17 +322,14 @@ a8"    `Y88 88 I8[    "" a8"     "" a8"     "8a I8[    ""
 "8a,   ,d88 88 aa    ]8I "8a,   ,aa "8a,   ,a8" aa    ]8I
  `"8bbdP"Y8 88 `"YbbdP"'  `"Ybbd8"'  `"YbbdP"'  `"YbbdP"'</pre></h2>
   <div class="sub"><span class="tag">la colección de vinilos, desde discogs</span><span class="tag" id="recCount"></span></div>
-  <div class="week rise">
-    <pre class="art" id="wDisc" aria-hidden="true"></pre>
-    <div>
-      <p class="tag" id="wWeek"></p>
-      <h3 id="wTitle"></h3>
-      <p id="wMeta"></p>
-      <p class="nota" id="wNota" hidden></p>
-      <div class="links"><a id="wLink" target="_blank" rel="noopener">ficha en discogs</a></div>
-    </div>
+  <div class="trio">
+    <article class="pick rise"><p class="tag">disco preferido</p><h3 id="d1T"></h3><p id="d1M"></p><a id="d1L" target="_blank" rel="noopener">ficha en discogs ↗</a></article>
+    <article class="pick rise"><p class="tag">último disco</p><h3 id="d2T"></h3><p id="d2M"></p><a id="d2L" target="_blank" rel="noopener">ficha en discogs ↗</a></article>
+    <article class="pick now rise"><p class="tag">escuchando ahora<span class="blink"> ●</span></p><pre class="art" id="wDisc" aria-hidden="true"></pre><h3 id="d3T"></h3><p id="d3M"></p><a id="d3L" target="_blank" rel="noopener">ficha en discogs ↗</a></article>
   </div>
+  <details class="all"><summary class="tag">toda la colección</summary>
   <ol class="recs" id="recList"></ol>
+  </details>
 </section>
 
 <pre class="art wave" data-wave aria-hidden="true"></pre>
@@ -293,15 +345,19 @@ a8"     "" a8"     "8a 88P'   `"8a  88    ""     `Y8 a8"     ""   88   a8"     "
  `"Ybbd8"'  `"YbbdP"'  88       88  "Y888 `"8bbdP"Y8  `"Ybbd8"'   "Y888 `"YbbdP"'</pre></h2>
   <div class="sub"><span class="tag">quién elige</span><span class="tag">córdoba, argentina</span></div>
   <div class="about">
-    <h3 class="rise">Alguien eligió cada tema.</h3>
+    <div class="face" id="face2">
+      <pre class="art" id="face2Pre" aria-hidden="true"></pre>
+      <img src="assets/btlsm.jpg" alt="Retrato de btlsm con anteojos oscuros" loading="lazy" />
+    </div>
     <div class="rise">
-      <p>Soy <b>btlsm</b> (beatalism). Junto discos, armo playlists y paso música en Córdoba.</p>
+      <h3>Alguien eligió cada tema.</h3>
       <p>Para tu local elijo qué suena según la hora, el lugar y la gente que va. <b>Sin algoritmo.</b></p>
       <ul class="offer">
         <li><span>playlists</span><span>programación para tu bar o café, por franja horaria</span></li>
         <li><span>vinilos</span><span>selección en vivo con discos de la colección</span></li>
         <li><span>dj sets</span><span>para fechas y eventos</span></li>
       </ul>
+      <a class="mail" id="mail"></a>
       <div class="links" id="contactLinks"></div>
     </div>
   </div>
@@ -318,7 +374,11 @@ a8"     "" a8"     "8a 88P'   `"8a  88    ""     `Y8 a8"     ""   88   a8"     "
 
 <script>
 /* ════════ CONTENIDO — editá acá ════════ */
-const CONTACTO = { email:'', instagram:'', whatsapp:'' };   // completá y aparecen solos en "contacto"
+const CONTACTO = { email:'antesdeayer@gmail.com', instagram:'beatalism', whatsapp:'' };
+
+// Carrusel de playlists: [nombre, id de Spotify]
+const ULTIMA_PLAYLIST       = ['¿Quién va a engrasar tu carreta?','0vhNgPlM3OquVH9L8lyJuJ'];
+const PLAYLIST_SELECCIONADA = ['joy of missing out','0ilHgUCzEhRmJc4SY59PxS'];
 
 // [energía baja, media, alta] por momento → playlist de Spotify
 const PLAYLISTS = {
@@ -343,7 +403,9 @@ const MIXES = [
 
 // Colección de Discogs (discogs.com/user/btlsm). Agregá `nota:'…'` a un disco para que salga cuando sea disco de la semana.
 const DISCOS = [{"id":"1548070","t":"Diamond Life","a":"Sade","y":"1985","c":"UK","l":"Epic"},{"id":"22040263","t":"Sign \"O\" The Times","a":"Prince","y":"2022","c":"US","l":"NPG Records"},{"id":"9045250","t":"Changes","a":"Keith Jarrett, Gary Peacock, Jack DeJohnette","y":"1984","c":"Brazil","l":"ECM Records"},{"id":"1908113","t":"The Mad Hatter","a":"Chick Corea","y":"1978","c":"US","l":"Polydor"},{"id":"12373198","t":"Now He Sings, Now He Sobs","a":"Chick Corea","y":"1977","c":"US","l":"Solid State Records"},{"id":"8486783","t":"Careless","a":"Stephen Bishop","y":"1976","c":"US","l":"ABC Records"},{"id":"4753882","t":"Aja","a":"Steely Dan","y":"1977","c":"US","l":"ABC Records"},{"id":"4987216","t":"Montreux \"First Divide\"","a":"Various","y":"1981","c":"US","l":"Columbia"},{"id":"3511306","t":"La Rada","a":"Ruben Rada","y":"1981","c":"Argentina","l":"Sazam Records"},{"id":"9119496","t":"One World","a":"John Martyn","y":"1977","c":"US","l":"Island Records"},{"id":"2086430","t":"Aleman '72","a":"Oscar Aleman","y":"1972","c":"Argentina","l":"Discos Redondel"},{"id":"530041","t":"An Evening With Herbie Hancock & Chick Corea In Concert 1978","a":"Herbie Hancock & Chick Corea","y":"1978","c":"US","l":"Columbia"},{"id":"11875326","t":"Récital Bobino 1963","a":"Edith Piaf / Théo Sarapo","y":"1967","c":"Argentina","l":"Odeon"},{"id":"30047941","t":"Automatic For The People","a":"R.E.M.","y":"2023","c":"Argentina","l":"Plaza Independencia Música"},{"id":"22000399","t":"Two Hearts","a":"Men At Work","y":"","c":"US","l":"Columbia"},{"id":"2963173","t":"Kamikaze","a":"Luis Alberto Spinetta","y":"1982","c":"Argentina","l":"Ratón Finta"},{"id":"2963268","t":"Tester De Violencia","a":"Luis Alberto Spinetta","y":"1988","c":"Argentina","l":"Del Cielito"},{"id":"9042270","t":"Sinfonías","a":"Waldo De Los Rios","y":"1970","c":"Argentina","l":"Music Hall"},{"id":"7982792","t":"Tan Lejano (So Far)","a":"Crosby, Stills, Nash & Young","y":"1975","c":"Argentina","l":"Atlantic"},{"id":"15609526","t":"Verdades y Mentiras","a":"Rodolfo Mederos","y":"1984","c":"Argentina","l":"CBS"},{"id":"14814310","t":"Let Me Touch Your Mind","a":"Ike & Tina Turner","y":"1973","c":"Uruguay","l":"United Artists Records"},{"id":"1866420","t":"Passions Of A Man: An Anthology Of His Atlantic Recordings","a":"Charles Mingus","y":"1979","c":"US","l":"Atlantic"},{"id":"13295907","t":"Mariposa Nocturna","a":"Donald Fagen","y":"1982","c":"Argentina","l":"Warner Bros. Records"},{"id":"10765650","t":"Music","a":"Carole King","y":"1972","c":"Argentina","l":"A&M Records"},{"id":"14136574","t":"Rhymes & Reasons = Rimas Y Razones","a":"Carole King","y":"1972","c":"Argentina","l":"A&M Records"}];
-const DISCO_DE_LA_SEMANA = null;   // null = rota solo cada semana · o poné el id de Discogs para fijarlo
+// Destacados de la sección discos: id de Discogs. "Último disco" es siempre el primero de la lista de arriba.
+const DISCO_PREFERIDO  = '2963173';
+const ESCUCHANDO_AHORA = '4753882';
 /* ════════════════════════════════════════ */
 
 const DENS = ["000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000","000000000000000000000000000000000000000000332356530030000000000000000000000000000000000000000000","000000000000000000000000000000000000004667788788987887777530000000000000000000000000000000000000","000000000000000000000000000000000002579999988988888999998897000000000000000000000000000000000000","000000000000000000000000000000000078898988778988998899988889763000000000000000000000000000000000","000000000000000000000000000000004899999978887678999778987777785000000000000000000000000000000000","000000000000000000000000000000289999998777754334466765666677786000000000000000000000000000000000","000000000000000000000000000000598899987654332002222200002335888400000000000000000000000000000000","000000000000000000000000000000398999986443222000000000000000488820000000000000000000000000000000","000000000000000000000000000000498999974333222220000000000000038950000000000000000000000000000000","000000000000000000000000000000698999754333222220000000000000005960000000000000000000000000000000","000000000000000000000000000000788888744443320000000000000000004960000000000000000000000000000000","000000000000000000000000000000688888644444444333320000000234445830000000000000000000000000000000","000000000000000000000000000000289987777888899999997776788898997840000000000000000000000000000000","000000000000000000000000000000355776778999999999999997999998997730000000000000000000000000000000","000000000000000000000000000000553469645999999999999985999999987600000000000000000000000000000000","000000000000000000000000000000355648644798999999999830799999976000000000000000000000000000000000","000000000000000000000000000000045546744446789999997400088998652000000000000000000000000000000000","000000000000000000000000000000025456754444445666654320045544220000000000000000000000000000000000","000000000000000000000000000000002457655444433222444320023000020000000000000000000000000000000000","000000000000000000000000000000000037555544322200466755630000030000000000000000000000000000000000","000000000000000000000000000000000003556754333332589899864300350000000000000000000000000000000000","000000000000000000000000000000000000657766434666787777456752550000000000000000000000000000000000","000000000000000000000000000000000000567777656788776655668854730000000000000000000000000000000000","000000000000000000000000000000000000488888778876553233345867700000000000000000000000000000000000","000000000000000000000000000000000000379989988666788999765799000000000000000000000000000000000000","000000000000000000000000000000000000356999998898776663357980000000000000000000000000000000000000","000000000000000000000000000000000000555689999986654453428700000000000000000000000000000000000000","000000000000000000000000000000000044455667999998766566786000000000000000000000000000000000000000","000000000000000000000000000004865544555666778999999898763200000000000000000000000000000000000000","000000000000000000000000003589954445555566666678888876505975300000000000000000000000000000000000","000000000000000000000000599999985445555555556666666655307999998630000000000000000000000000000000","000000000000000000002579999999999744555555556655555553069899989999752000000000000000000000000000","000000000000000000479999999999999997655555555555555522599999998999999874000000000000000000000000","000000000000000369999999999999999999998765544455443027989999999999998999986420000000000000000000","000000000000058999999999999999999999999999887777764599899999999999999999999997500000000000000000","000000000037999999999999999999999999999999999999999998999999999999999999999889992000000000000000","000000000699999999999999999999999999999999999999988898999999999999999999999899899400000000000000","000000039999999999999999999999999999999999999999888989999999999999999999999999999950000000000000","000000599999999999999999999999999999999999999998888889999999999999999999999999999893000000000000","000006999999999999999999999999999999999999999988888899999999999999999999999999999888000000000000","002239999999999999999999999999999999999999999888888999999999999999999999999999999989600000000000","445379999999999999999999999999999999999999998988899999999999999999999999999999999988900000000000","444499999999999999999999999999999999999999889888999999999999999999999999999999999988960000000000","454699999999999999999999999999999999999998899889999999999999999999999999999999999998892000000000","454899999999999999999999999999999999999878998899999999999999999999999999999999999998896000000000","444999999999999999999999999999999899997987788999999999999999999999999999999999999988889000000002","545999999999999999999998999999996089998899868977898999999999999999999999999999999998989500000002","546999999999999999999504653735606079999878730640460044030602237224999999999999999999998900000002","546999999999999999999824600032606289999998032600640204080404604020799999999999999999998940000002","547999999999999999999986823262238999999632200444242324263544527423888899999999999999988980000003","549999999999999999999995223200389999994000000453324420002232020000400002359999999999998894000003","459999999999999999999992006526999999800000026643335555400233333220564300029999999999998898000003","479999999999999999999990038899999995000000037653245544443332344432400003379999999999988999400003","499999999999999999999993079999999800400000277632235553234444433443652026999999999999988989900003","699999999999999999999984469999996005200002666630225534533565555444622000299999999999989998940003","899999999999999999999997899999842474000027656543203643332666555544642200499999999999999999990003","999999999999999999999999999998355670000378445545322564000465544554630699999999999999999999895003","999999999999999999999999999972343830005665555405534465000474443445525099999999999999999999999004","999999999999999999999999999325037557678765742230323435000265444444603099999999999999999999989704","999999999999999999999999968323695789734976652000232356000356545444650599999999999999999999988923","999999999999999999999999537535578875533402024000342035400466653544500228999999999999999999999973","999999999999999999999999256647575000067034000000000200530023420653653008999999999999999999875424","999999999999999999999999622036857400747604204300000002523000004564520049999999999999988850000004","999999999999999999999999944600554025347400000730342025222202002466630069999999999754320220000004","999999999999999999999999956972330000003000003530264454025330023046643006999999865300000220000004","999986666666666779999999944552000000020000000000740020000000043226600006999998653220000230000004","678865544333220000499999848786000000000000000006400000000000052234636899999986554322222240000004","444455544333332200236999604878730000000000000006300000000000054020600048999977654300022340000004","555465554223333323200379400366763000000000000004400000000000025400752305999865433200003330000004","555465555433334333200025522045662022000000000002300000000000002520620027999654432222223430000005","555455454443434333322222245336774223322000000000232000000000000220303799996544432222334430000005","555455555444444443322220224777888665699999999999999999988888877787899999976534322202333430000005","444445555554454444332222202245898567699999999999999999999999999999999999965423232022234520000005","444444555555455554443232222223589999999999999999999999999999999999999999854323222022334400000004","444445445555555555544432222200237999999999999999999999999999999999999999753332222223334300000004"];             // el retrato: densidad 0–9 por celda, sacada de assets/btlsm.jpg
@@ -382,21 +444,25 @@ function face({noise=0, scan=-1, wob=0, mx=-99, my=-99}){
 }
 function fit(el, maxW, maxH){ el.style.setProperty('--fs', Math.max(3,Math.min(maxH/ROWS, maxW/(COLS*.602))).toFixed(2)+'px') }
 
-const inicio=$('inicio'), facePre=$('facePre'), faceImg=document.querySelector('.face img');
+const inicio=$('inicio'), facePre=$('facePre'), face2=$('face2'), face2Pre=$('face2Pre'), faceImg=face2.querySelector('img');
 const born=performance.now(); let heroP=0, vel=0, mouse={x:-99,y:-99};
-function fitAll(){ const s=innerWidth<=820; fit($('face'), innerWidth*(s?.92:.5), innerHeight*(s?.56:.84)); fit($('lPre'), innerWidth*.94, innerHeight*.8) }
+function fitAll(){ const s=innerWidth<=820; fit($('face'), innerWidth*(s?.92:.5), innerHeight*(s?.56:.84)); fit(face2, innerWidth*(s?.8:.36), innerHeight*.74); fit($('lPre'), innerWidth*.94, innerHeight*.8) }
 $('face').addEventListener('pointermove',e=>{ const r=facePre.getBoundingClientRect(); mouse={x:(e.clientX-r.left)/r.width*COLS, y:(e.clientY-r.top)/r.height*ROWS} });
 $('face').addEventListener('pointerleave',()=>{ mouse={x:-99,y:-99} });
 function drawHero(){
   const intro=clamp01(1-(performance.now()-born)/1800);        // al cargar: sintoniza desde el ruido
-  const q=clamp01((heroP-.12)/.6);                               // con el scroll: la foto se revela de arriba hacia abajo
-  const scan=q>0?Math.round(q*ROWS):-1;
-  facePre.textContent=face({noise:intro*.9+Math.min(.35,vel*.004), scan, wob:Math.min(5,vel*.05), mx:mouse.x, my:mouse.y});
+  facePre.textContent=face({noise:intro*.9+Math.min(.35,vel*.004), wob:Math.min(5,vel*.05), mx:mouse.x, my:mouse.y});
+}
+function drawContact(){                                          // en contacto: la foto se revela de arriba hacia abajo con el scroll
+  const r=face2.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight) return;
+  const q=clamp01((innerHeight*.92-r.top)/(innerHeight*.75)-.12);
+  face2Pre.textContent=face({scan:q>0?Math.round(q*ROWS):-1, noise:Math.min(.3,vel*.004)});
   faceImg.style.clipPath='inset(0 0 '+((1-q)*100).toFixed(2)+'% 0)';
-  $('heroHint').firstChild.textContent = q>=1 ? '↓ playlists' : q>0 ? '↓ revelando' : '↓ seguí bajando';
 }
 
 /* ════════ SCROLL: todo lo que se mueve con la página ════════ */
+const introBox=$('presentacion'); $('intro').innerHTML=$('intro').textContent.split(' ').map(w=>'<span>'+w+'</span>').join(' ');
+const words=[...$('intro').children];
 const drifts=[...document.querySelectorAll('[data-drift]')], waves=[...document.querySelectorAll('[data-wave]')];
 let lastY=scrollY;
 function wave(el,t){
@@ -405,7 +471,8 @@ function wave(el,t){
   el.textContent=s;
 }
 function onScroll(){
-  const r=inicio.getBoundingClientRect(); heroP=clamp01(-r.top/(r.height-innerHeight));
+  const ir=introBox.getBoundingClientRect(), ip=clamp01((-ir.top+innerHeight*.35)/(ir.height-innerHeight*.75)), k2=Math.round(ip*words.length);
+  for(let i=0;i<words.length;i++) words[i].classList.toggle('on',calm||i<k2);
   for(const el of drifts){ const b=el.parentElement.getBoundingClientRect(); const k=(b.top+b.height/2-innerHeight/2)/innerHeight; el.style.transform='translate3d('+(Math.max(0,k)*Math.abs(+el.dataset.drift)*60).toFixed(2)+'vw,0,0)' }
 }
 let tick=false;
@@ -421,13 +488,20 @@ function scramble(el,text){
   const step=()=>{ f++; el.textContent=[...text].map((c,i)=> c===' '||i<text.length*f/N ? c : GLITCH[(Math.random()*GLITCH.length)|0]).join(''); if(f<N) el._raf=requestAnimationFrame(step) };
   step();
 }
+const spEmbed=(name,id)=>'<iframe title="Playlist '+esc(name)+' en Spotify" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" src="https://open.spotify.com/embed/playlist/'+id+'?utm_source=generator&theme=0"></iframe>';
+[['plLast',ULTIMA_PLAYLIST],['plPick',PLAYLIST_SELECCIONADA]].forEach(([k,[name,id]])=>{ $(k+'Name').textContent=name; $(k+'Open').href='https://open.spotify.com/playlist/'+id; $(k+'Embed').innerHTML=spEmbed(name,id) });
+const track=$('carTrack'), tabs=[...document.querySelectorAll('.car-tabs button')];
+function carGo(i){ track.scrollTo({left:i*track.clientWidth,behavior:calm?'auto':'smooth'}) }
+function carSync(){ const i=Math.round(track.scrollLeft/track.clientWidth); tabs.forEach((b,k)=>{b.classList.toggle('on',k===i);b.setAttribute('aria-current',k===i)}); $('carCount').textContent=[0,1,2].map(k=>k===i?'●':'○').join(' ')+'   0'+(i+1)+' / 03' }
+$('playlists').addEventListener('click',e=>{ const b=e.target.closest('[data-go]'); if(b) carGo(+b.dataset.go) });
+track.addEventListener('scroll',carSync,{passive:true}); carSync();
 const form=$('moodForm'), MN={manana:'mañana',tarde:'tarde',atardecer:'atardecer',noche:'noche'}, EN=['energía baja','energía media','energía alta'];
 function mood(auto){
   const m=form.m.value, e=+form.e.value, [name,id]=PLAYLISTS[m][e], h=new Date();
   $('moodWhy').textContent=(auto?'son las '+pad2(h.getHours())+':'+pad2(h.getMinutes())+' → ':'')+MN[m]+' · '+EN[e];
   scramble($('moodName'),name);
   $('moodOpen').href='https://open.spotify.com/playlist/'+id;
-  $('moodEmbed').innerHTML='<iframe title="Playlist '+esc(name)+' en Spotify" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" src="https://open.spotify.com/embed/playlist/'+id+'?utm_source=generator&theme=0"></iframe>';
+  $('moodEmbed').innerHTML=spEmbed(name,id);
 }
 (function(){ const h=new Date().getHours(); form.m.value = h>=6&&h<12?'manana':h<17?'tarde':h<21?'atardecer':'noche'; mood(true) })();
 form.addEventListener('change',()=>mood(false));
@@ -464,15 +538,10 @@ function disc(cols,t){
   return out;
 }
 (function(){
-  const N=DISCOS.length, now=new Date(), t=new Date(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate()));
-  const day=t.getUTCDay()||7; t.setUTCDate(t.getUTCDate()+4-day);
-  const y=t.getUTCFullYear(), w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7);
-  const d = DISCOS.find(x=>x.id===String(DISCO_DE_LA_SEMANA)) || DISCOS[(y*53+w*7)%N];
-  $('wWeek').textContent='disco de la semana · '+pad2(w)+' / '+y;
-  $('wTitle').textContent=d.a+' — '+d.t;
-  $('wMeta').textContent=[d.y,d.c,d.l,'vinilo'].filter(Boolean).join(' · ');
-  $('wLink').href=discogs(d);
-  if(d.nota){$('wNota').textContent=d.nota;$('wNota').hidden=false}
+  const N=DISCOS.length, by=id=>DISCOS.find(x=>x.id===String(id))||DISCOS[0];
+  [[1,by(DISCO_PREFERIDO)],[2,DISCOS[0]],[3,by(ESCUCHANDO_AHORA)]].forEach(([n,d])=>{
+    $('d'+n+'T').textContent=d.a+' — '+d.t; $('d'+n+'M').textContent=[d.y,d.c,d.l].filter(Boolean).join(' · '); $('d'+n+'L').href=discogs(d);
+  });
   $('recCount').textContent=N+' discos';
   $('recList').innerHTML=DISCOS.map((r,i)=>'<li><a class="rec" href="'+discogs(r)+'" target="_blank" rel="noopener"><span class="n">'+pad2(i+1)+'</span><span class="a">'+esc(r.a)+'</span><span class="t">'+esc(r.t)+'</span><span class="y">'+(r.y||'—')+'</span><span class="l">'+esc(r.l)+'</span></a></li>').join('');
 })();
@@ -480,9 +549,9 @@ function disc(cols,t){
 /* ════════ CONTACTO ════════ */
 (function(){
   const L=[];
-  if(CONTACTO.email) L.push(['mailto:'+CONTACTO.email,CONTACTO.email]);
+  if(CONTACTO.email){ $('mail').href='mailto:'+CONTACTO.email; $('mail').textContent=CONTACTO.email } else $('mail').remove();
   if(CONTACTO.whatsapp) L.push(['https://wa.me/'+CONTACTO.whatsapp.replace(/\D/g,''),'whatsapp']);
-  if(CONTACTO.instagram) L.push(['https://instagram.com/'+CONTACTO.instagram.replace('@',''),'instagram']);
+  if(CONTACTO.instagram) L.push(['https://instagram.com/'+CONTACTO.instagram.replace('@',''),'instagram @'+CONTACTO.instagram.replace('@','')]);
   L.push(['https://www.mixcloud.com/antesdeayer/','mixcloud'],['https://open.spotify.com/user/11134314484','spotify'],['https://www.discogs.com/es/user/btlsm/collection','discogs']);
   $('contactLinks').innerHTML=L.map(([h,t])=>'<a href="'+h+'"'+(h.startsWith('http')?' target="_blank" rel="noopener"':'')+'>'+esc(t)+'</a>').join('');
 })();
@@ -512,12 +581,13 @@ function loop(ts){
     return;
   }
   if(inicio.getBoundingClientRect().bottom>0) drawHero();
+  drawContact();
   for(const el of waves){ const r=el.getBoundingClientRect(); if(r.bottom>0&&r.top<innerHeight) wave(el,tt) }
   const sr=$('scope').getBoundingClientRect(); if(sr.bottom>0&&sr.top<innerHeight) scope(tt);
-  const wr=$('wDisc').getBoundingClientRect(); if(wr.bottom>0&&wr.top<innerHeight) $('wDisc').textContent=disc(46,tt*.5+scrollY*.004);
+  const wr=$('wDisc').getBoundingClientRect(); if(wr.bottom>0&&wr.top<innerHeight) $('wDisc').textContent=disc(46,tt*3.45);
 }
 fitAll(); onScroll();
-facePre.textContent=face({}); $('lPre').textContent=face({}); $('wDisc').textContent=disc(46,0); scope(0); waves.forEach(el=>wave(el,0));
+facePre.textContent=face({}); face2Pre.textContent=face({}); $('lPre').textContent=face({}); $('wDisc').textContent=disc(46,0); scope(0); waves.forEach(el=>wave(el,0));
 if(!calm) requestAnimationFrame(loop);
 </script>
 </body>
